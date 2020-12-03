@@ -28,8 +28,10 @@ Image names have the following format: `{}_frame_{:05d}.jpg`, for example `my_vi
 
 ## How To Use
 
-**Step 1:** Add app to your team from Ecosystem if it is not there.
+**Step 1:** Add app to your team from Ecosystem if it is not there
 
 **Step 2:** Run app from the context menu of video project
 
-**Step 3:** Wait until the task is finished, new project with name = original name + "(images)" suffix is created in the same workspace. Link to project is available in task output column.
+<img src="https://i.imgur.com/WZV7kdJ.png" width="500px"/>
+
+**Step 3:** Wait until the task is finished, new project with name = original name + "(images)" suffix is created in the same workspace. Link to project is available in task output column
