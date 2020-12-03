@@ -20,5 +20,14 @@
 
 ## Overview
 
-Application converts all labeled video frames (both tags and figures) to images project. Additionaly, information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata.
+Application converts all labeled video frames (both tags and figures) to images project. Additionaly, information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. Image names have the following format: "{}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg". Video tags (both properties and frame range tags) are assigned to corresponding images and objects
 
+<img src="https://i.imgur.com/7zQQVFA.png"/>
+
+## How To Use
+
+**Step 1:** Add app to your team from Ecosystem if it is not there.
+
+**Step 2:** Run app from the context menu of video project
+
+**Step 3:** Wait until the task is finished, new project with name = original name + "(images)" suffix is created in the same workspace. Link to project is available in task output column.
