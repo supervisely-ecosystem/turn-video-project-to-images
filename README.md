@@ -20,6 +20,5 @@
 
 ## Overview
 
-Classification and
+Application converts all labeled video frames (both tags and figures) to images project. Additionaly, information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata.
 
-TODO: image metadata???
