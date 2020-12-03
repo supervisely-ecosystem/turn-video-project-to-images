@@ -83,7 +83,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 anns = []
                 progress = sly.Progress("Video: {!r}".format(video_info.name), len(frames_to_convert))
                 for frame_index in frames_to_convert:
-                    names.append('{}_frame_{:05d}.png'.format(name, frame_index))
+                    names.append('{}_frame_{:05d}.jpg'.format(name, frame_index))
                     images.append(api.video.frame.download_np(video_info.id, frame_index))
 
                     #save additional info to image metadata about original video
@@ -108,7 +108,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
                     anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
 
-                    if len(names) > 10:
+                    if len(names) >= 5:
                         upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
 
                 upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
