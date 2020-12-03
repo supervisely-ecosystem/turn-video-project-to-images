@@ -110,7 +110,6 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                     if len(names) >= 5:
                         upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
-
                 upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
     my_app.stop()
 
