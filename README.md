@@ -1,5 +1,5 @@
 <div align="center" markdown>
-<img src="https://i.imgur.com/8ay5Hct.png"/>
+<img src="https://i.imgur.com/HkkZyei.png"/>
 
 # Turn videos project into images project
 
