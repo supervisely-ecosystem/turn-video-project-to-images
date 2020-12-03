@@ -98,12 +98,14 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     })
 
                     labels = []
-                    for figure in ann.frames.get(frame_index).figures:
-                        tags_to_assign = object_props[figure.parent_object.key()].copy()
-                        tags_to_assign.extend(object_frame_tags[figure.parent_object.key()].get(frame_index, []).copy())
-                        cur_label = sly.Label(figure.geometry, figure.parent_object.obj_class,
-                                              sly.TagCollection(tags_to_assign))
-                        labels.append(cur_label)
+                    frame_annotation = ann.frames.get(frame_index)
+                    if frame_annotation is not None:
+                        for figure in frame_annotation.figures:
+                            tags_to_assign = object_props[figure.parent_object.key()].copy()
+                            tags_to_assign.extend(object_frame_tags[figure.parent_object.key()].get(frame_index, []).copy())
+                            cur_label = sly.Label(figure.geometry, figure.parent_object.obj_class,
+                                                  sly.TagCollection(tags_to_assign))
+                            labels.append(cur_label)
 
                     img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
                     anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
