@@ -34,4 +34,4 @@ Image names have the following format: `{}_frame_{:05d}.jpg`, for example `my_vi
 
 <img src="https://i.imgur.com/WZV7kdJ.png" width="500px"/>
 
-**Step 3:** Wait until the task is finished, new project with name = original name + "(images)" suffix is created in the same workspace. Link to project is available in task output column
+**Step 3:** Wait until the task is finished, new project with `name` = `original name` + `(images)` suffix is created in the same workspace. Link to project is available in task output column
