@@ -10,15 +10,16 @@ WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
 
 
-def upload_and_reset(dataset_id, names, images, anns, progress):
+def upload_and_reset(api:sly.Api, dataset_id, names, images, anns, metas, progress):
     if len(names) > 0:
-        new_image_infos = api.image.upload_nps(dataset_id, names, images)
+        new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
         progress.iters_done_report(len(names))
     del names[:]
     del images[:]
     del anns[:]
+    del metas[:]
 
 
 @my_app.callback("turn_into_images_project")
@@ -45,65 +46,71 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
         videos = api.video.get_list(dataset.id)
         for batch in sly.batched(videos):
             for video_info in batch:
-                #@TODO: for debug
-                # tagged frames - 372187
-                # tagged objects - 371533
-                if video_info.id != 371533:
-                    continue
-
                 name = sly.fs.get_file_name(video_info.name)
                 ann_info = api.video.annotation.download(video_info.id)
                 ann = sly.VideoAnnotation.from_json(ann_info, meta, key_id_map)
+                frames_to_convert = []
 
-                #object_key -> frame_index -> list of tags
-                object_frame_tags = defaultdict(lambda: defaultdict(list))
-                #object_key -> list of properrties
-                object_props = defaultdict(list)
+                def _convert_tags(tags, prop_container, frame_container, frame_indices=None):
+                    for video_tag in tags:
+                        tag = sly.Tag(video_tag.meta, value=video_tag.value, labeler_login=video_tag.labeler_login)
+                        if video_tag.frame_range is None:
+                            prop_container.append(tag)
+                        else:
+                            for frame_index in range(video_tag.frame_range[0], video_tag.frame_range[1] + 1):
+                                frame_container[frame_index].append(tag)
+                                if frame_indices is not None:
+                                    frame_indices.append(frame_index)
 
                 video_props = []
-                video_frame_tags = defaultdict(lambda: defaultdict(list))
-                for tag in ann.tags:
-                    dest_tag_meta = dst_meta.get_tag_meta(tag.name)
+                video_frame_tags = defaultdict(list)
+                _convert_tags(ann.tags, video_props, video_frame_tags, frames_to_convert)
 
-                for object in ann.objects:
-                    for tag in vobject.tags:
-                        if tag.frame_range is None:
-                            object_props[object.key()].append(tag)
-                        else:
-                            tag_without_range = tag.clone()
-                            tag_without_range._frame_range = None
-                            for frame_index in tag.frame_range:
-                                object_frame_tags[object.key()][frame_index].append(tag_without_range)
+                # object_key -> frame_index -> list of tags
+                object_frame_tags = defaultdict(lambda: defaultdict(list))
+                # object_key -> list of properrties
+                object_props = defaultdict(list)
+                for vobject in ann.objects:
+                    _convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
 
-                progress = sly.Progress("Video: {!r}".format(video_info.name), len(ann.frames))
-                image_names = []
-                frame_images = []
-                dst_anns = []
+                frames_to_convert.extend(list(ann.frames.keys()))
+                frames_to_convert.sort()
 
-                for frame in ann.frames:
-                    image_names.append('{}_frame_{:05d}.png'.format(name, frame.index))
-                    frame_images.append(api.video.frame.download_np(video_info.id, frame.index))
+                names = []
+                images = []
+                metas = []
+                anns = []
+                progress = sly.Progress("Video: {!r}".format(video_info.name), len(frames_to_convert))
+                for frame_index in frames_to_convert:
+                    names.append('{}_frame_{:05d}.png'.format(name, frame_index))
+                    images.append(api.video.frame.download_np(video_info.id, frame_index))
+
+                    #save additional info to image metadata about original video
+                    metas.append({
+                        "video_id": video_info.id,
+                        "video_name": video_info.name,
+                        "frame_index": frame_index,
+                        "video_dataset_id": video_info.dataset_id,
+                        "video_dataset_name":dataset.name,
+                        "video_project_id": project.id,
+                        "video_project_name": project.name
+                    })
 
                     labels = []
-                    for figure in frame.figures:
+                    for figure in ann.frames.get(frame_index).figures:
                         tags_to_assign = object_props[figure.parent_object.key()].copy()
-                        if frame.index in object_frame_tags[figure.parent_object.key()]:
-                            tags_to_assign.extend(
-                                object_frame_tags[figure.parent_object.key()][frame.index].copy()
-                            )
-
-                        cur_label = sly.Label(figure.geometry, figure.parent_object.obj_class, sly.TagCollection(tags_to_assign))
+                        tags_to_assign.extend(object_frame_tags[figure.parent_object.key()].get(frame_index, []).copy())
+                        cur_label = sly.Label(figure.geometry, figure.parent_object.obj_class,
+                                              sly.TagCollection(tags_to_assign))
                         labels.append(cur_label)
 
-                    #@old implementation that skips object tags
-                    #labels = [sly.Label(figure.geometry, figure.parent_object.obj_class) for figure in frame.figures]
+                    img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
+                    anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
 
-                    dst_anns.append(sly.Annotation(ann.img_size, labels=labels))
-                    if len(image_names) > 10:
-                        upload_and_reset(dst_dataset.id, image_names, frame_images, dst_anns, progress)
+                    if len(names) > 10:
+                        upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
 
-                upload_and_reset(dst_dataset.id, image_names, frame_images, dst_anns, progress)
-
+                upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
     my_app.stop()
 
 
