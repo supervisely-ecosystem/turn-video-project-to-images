@@ -74,6 +74,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     _convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
 
                 frames_to_convert.extend(list(ann.frames.keys()))
+                frames_to_convert = list(dict.fromkeys(frames_to_convert))
                 frames_to_convert.sort()
 
                 names = []
