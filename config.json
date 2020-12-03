@@ -1,0 +1,18 @@
+{
+  "name": "Turn video project into images",
+  "type": "app",
+  "categories": [
+    "Videos",
+    "Transform"
+  ],
+  "description": "Labeled video frames to labeled images",
+  "docker_image": "supervisely/base-py-sdk:6",
+  "main_script": "src/main.py",
+  "task_location": "workspace_tasks",
+  "icon": "https://i.imgur.com/P6BjsxA.png",
+  "icon_background": "#FFFFFF",
+  "headless": true,
+  "context_menu": {
+    "target": ["videos_project"]
+  }
+}
