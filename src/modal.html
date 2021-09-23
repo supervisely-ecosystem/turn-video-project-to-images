@@ -1,10 +1,6 @@
-<div>
-    <b>Overview:</b>
-    <ul>
-        <li>Only labeled video frames are converted</li>
-        <li>Result project name = original name + "(images)" suffix</li>
-        <li>Dataset structure and names remain unchanged</li>
-        <li>Image name format: "{}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg"</li>
-        <li>Video tags (both properties and frame range tags) are assigned to corresponding images and objects</li>
-    </ul>
+<div class="fflex align-start">
+    <el-checkbox v-model="state.onlyLabeled" class="mt10 mr10"></el-checkbox>
+    <sly-field class="mt20" title="Only annotated frames"
+               description="Import frames with tags or labels only">
+    </sly-field>
 </div>

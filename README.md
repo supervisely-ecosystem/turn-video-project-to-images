@@ -20,7 +20,15 @@
 
 ## Overview
 
-Application converts all labeled video frames (both tags and figures) to images project. Additionaly, information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. 
+Application key points:  
+- Result project name = original name + "(images)" suffix
+- Dataset structure and names remain unchanged
+- Image name format: "{}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg"
+- Video tags (both properties and frame range tags) are assigned to corresponding images and objects
+- Ability to convert only labeled video frames
+
+
+Application converts all video frames (both tags and figures) to images project or only labeled frames, if checked. Additionaly, information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. 
 
 Image names have the following format: `{}_frame_{:05d}.jpg`, for example `my_video_frame_00077.jpg`. Video tags (both properties and frame range tags) are assigned to corresponding images and objects
 

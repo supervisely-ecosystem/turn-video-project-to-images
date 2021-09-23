@@ -2,3 +2,4 @@
 venv
 secret_debug.env
 supervisely_lib
+src/debug
