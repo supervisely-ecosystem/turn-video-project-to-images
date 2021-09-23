@@ -17,3 +17,6 @@ if project.type != str(sly.ProjectType.VIDEOS):
 
 meta_json = api.project.get_meta(project.id)
 meta = sly.ProjectMeta.from_json(meta_json)
+
+if ONLY_LABELS and len(meta.obj_classes) == 0 and len(meta.tag_metas) == 0:
+    raise ValueError("Nothing to convert, there are no tags and classes in project {!r}".format(project.name))

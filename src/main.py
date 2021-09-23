@@ -10,7 +10,7 @@ import functions as f
 @g.my_app.callback("turn_into_images_project")
 @sly.timeit
 def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
-    res_project_name = "{}(images)".format(g.project.name)
+    res_project_name = f"{g.project.name}(images)"
     dst_project = api.project.create(g.WORKSPACE_ID, res_project_name, type=sly.ProjectType.IMAGES, change_name_if_conflict=True)
     api.project.update_meta(dst_project.id, g.meta_json)
 
