@@ -1,11 +1,11 @@
 {
-  "name": "Turn video project into images",
+  "name": "Videos project to images project",
   "type": "app",
   "categories": [
     "Videos",
     "Transform"
   ],
-  "description": "Labeled video frames to labeled images",
+  "description": "Creates videos project from images project",
   "docker_image": "supervisely/base-py-sdk:6",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
