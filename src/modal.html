@@ -1,6 +1,13 @@
-<div class="fflex align-start">
-    <el-checkbox v-model="state.onlyLabeled" class="mt10 mr10"></el-checkbox>
-    <sly-field class="mt20" title="Only annotated frames"
-               description="Import frames with tags or labels only">
+<div>
+    <sly-field title="Choose whether to transform all video frames or only annotated frames">
+        <el-select v-model="state.Options">
+            <el-option key="all" label="All video frames" value="all"></el-option>
+            <el-option key="annotated" label="Only annotated video frames" value="annotated"></el-option>
+        </el-select>
     </sly-field>
+
+    <div>
+        <sly-select-dataset :project-id="state.slyProjectId" :datasets.sync="state.datasets"
+                            :options="{multiple: true}"></sly-select-dataset>
+    </div>
 </div>

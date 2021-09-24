@@ -9,7 +9,7 @@
   "docker_image": "supervisely/base-py-sdk:6.1.96",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
-  "modal_template_state": {"onlyLabeled": "false"},
+  "modal_template_state": {"Options": "all", "selectedDatasets": []},
   "task_location": "workspace_tasks",
   "icon": "https://i.imgur.com/P6BjsxA.png",
   "icon_background": "#FFFFFF",

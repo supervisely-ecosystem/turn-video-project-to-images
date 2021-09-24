@@ -15,7 +15,8 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
     api.project.update_meta(dst_project.id, g.meta_json)
 
     key_id_map = KeyIdMap()
-    for dataset in api.dataset.get_list(g.project.id):
+    for dataset_name in g.SELECTED_DATASETS:
+        dataset = api.dataset.get_info_by_name(g.PROJECT_ID, dataset_name)
         dst_dataset = api.dataset.create(dst_project.id, dataset.name)
         videos = api.video.get_list(dataset.id)
         for batch in sly.batched(videos):
@@ -33,7 +34,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 for vobject in ann.objects:
                     f.convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
 
-                if g.ONLY_LABELS:
+                if g.OPTIONS == "annotated":
                     frames_to_convert.extend(list(ann.frames.keys()))
                     frames_to_convert = list(dict.fromkeys(frames_to_convert))
                     frames_to_convert.sort()
@@ -53,7 +54,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         "video_name": video_info.name,
                         "frame_index": frame_index,
                         "video_dataset_id": video_info.dataset_id,
-                        "video_dataset_name":dataset.name,
+                        "video_dataset_name": dataset.name,
                         "video_project_id": g.project.id,
                         "video_project_name": g.project.name
                     })
