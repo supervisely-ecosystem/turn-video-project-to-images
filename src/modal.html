@@ -7,7 +7,7 @@
     </sly-field>
 
     <div>
-        <sly-select-dataset :project-id="state.slyProjectId" :datasets.sync="state.datasets"
+        <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.datasets"
                             :options="{multiple: true}"></sly-select-dataset>
     </div>
 </div>
