@@ -9,9 +9,8 @@ TEAM_ID = int(os.environ['context.teamId'])
 WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
 
-SELECTED_DATASETS = json.loads(os.environ['modal.state.selectedDatasets'])
+SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
 OPTIONS = os.environ['modal.state.Options']
-
 
 project = api.project.get_info_by_id(PROJECT_ID)
 if project is None:

@@ -5,7 +5,7 @@
             <el-option key="annotated" label="Only annotated video frames" value="annotated"></el-option>
         </el-select>
     </sly-field>
-
+    {{state}}
     <div>
         <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
                             :options="{multiple: true}"></sly-select-dataset>
