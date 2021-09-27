@@ -1,3 +1,4 @@
+import globals as g
 import supervisely_lib as sly
 
 
@@ -13,9 +14,11 @@ def upload_and_reset(api: sly.Api, dataset_id, names, images, anns, metas, progr
     del metas[:]
 
 
-def convert_tags(tags, prop_container, frame_container, frame_indices=None):
+def convert_tags(vobject_id, tags, prop_container, frame_container, frame_indices=None):
     for video_tag in tags:
         tag = sly.Tag(video_tag.meta, value=video_tag.value, labeler_login=video_tag.labeler_login)
+        vobj_id_tag = sly.Tag(g.vobj_id_tag_meta, value=vobject_id)
+        prop_container.append(vobj_id_tag)
         if video_tag.frame_range is None:
             prop_container.append(tag)
         else:
@@ -23,3 +26,4 @@ def convert_tags(tags, prop_container, frame_container, frame_indices=None):
                 frame_container[frame_index].append(tag)
                 if frame_indices is not None:
                     frame_indices.append(frame_index)
+

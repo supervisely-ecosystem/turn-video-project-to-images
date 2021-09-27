@@ -18,8 +18,14 @@ if project is None:
 if project.type != str(sly.ProjectType.VIDEOS):
     raise TypeError("Project type is {!r}, but have to be {!r}".format(project.type, sly.ProjectType.VIDEOS))
 
+
+
 meta_json = api.project.get_meta(project.id)
 meta = sly.ProjectMeta.from_json(meta_json)
+
+if "object_id" not in [tag.name for tag in meta.tag_metas]:
+    vobj_id_tag_meta = sly.TagMeta(name="object_id", value_type=sly.TagValueType.ANY_NUMBER)
+    meta = meta.add_tag_meta(vobj_id_tag_meta)
 
 if OPTIONS == "annotated" and len(meta.obj_classes) == 0 and len(meta.tag_metas) == 0:
     raise ValueError("Nothing to convert, there are no tags and classes in project {!r}".format(project.name))
