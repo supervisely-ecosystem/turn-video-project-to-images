@@ -32,8 +32,10 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 object_frame_tags = defaultdict(lambda: defaultdict(list))
                 object_props = defaultdict(list)
                 for vobject in ann.objects:
+                    f.convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
+
                     vobject_id = key_id_map.get_object_id(vobject.key())
-                    f.convert_tags(vobject_id, vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
+                    f.add_object_id_tag(vobject_id, object_props[vobject.key()])
 
                 if g.OPTIONS == "annotated":
                     frames_to_convert.extend(list(ann.frames.keys()))
