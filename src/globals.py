@@ -24,7 +24,8 @@ meta_json = api.project.get_meta(project.id)
 meta = sly.ProjectMeta.from_json(meta_json)
 
 if "object_id" not in [tag.name for tag in meta.tag_metas]:
-    vobj_id_tag_meta = sly.TagMeta(name="object_id", value_type=sly.TagValueType.ANY_NUMBER)
+    vobj_id_tag_meta = sly.TagMeta(name="object_id", value_type=sly.TagValueType.ANY_NUMBER,
+                                   applicable_to=sly.TagApplicableTo.OBJECTS_ONLY)
     meta = meta.add_tag_meta(vobj_id_tag_meta)
 
 if OPTIONS == "annotated" and len(meta.obj_classes) == 0 and len(meta.tag_metas) == 0:
