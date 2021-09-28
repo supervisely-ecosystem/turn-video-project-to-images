@@ -9,16 +9,17 @@ TEAM_ID = int(os.environ['context.teamId'])
 WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
 
-SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
 OPTIONS = os.environ['modal.state.Options']
+SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
+ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ('true', '1', 't')
+if ALL_DATASETS:
+    SELECTED_DATASETS = [dataset.name for dataset in api.dataset.get_list(PROJECT_ID)]
 
 project = api.project.get_info_by_id(PROJECT_ID)
 if project is None:
     raise RuntimeError("Project {!r} not found".format(project.name))
 if project.type != str(sly.ProjectType.VIDEOS):
     raise TypeError("Project type is {!r}, but have to be {!r}".format(project.type, sly.ProjectType.VIDEOS))
-
-
 
 meta_json = api.project.get_meta(project.id)
 meta = sly.ProjectMeta.from_json(meta_json)
