@@ -23,6 +23,7 @@
 Transforms supervisely **videos** project to supervisely **images** project. 
 
 Application key points:  
+- Adds additional `object_id` tag to objects for backward compatibility with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project). It's recommended to not have `object_id` tag in the source project.
 - Backward compatible with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project)
 - Result project name = original name + "(images)" suffix
 - Dataset structure and names remain unchanged
@@ -30,7 +31,7 @@ Application key points:
 - Video tags (both properties and frame range tags) are assigned to corresponding images and objects
 - Ability to convert only labeled video frames
 - Information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. 
-- Adds additional `object_id` tag to objects for backward compatibility with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project)
+
 
 
 <img src="https://i.imgur.com/7zQQVFA.png"/>
@@ -48,7 +49,7 @@ Application key points:
 3. Check the box if you need only annotated video frames, select datasets and press the `Run` button.
  
 <div align="center" markdown>
-<img src="https://i.imgur.com/WR6HflM.png" width="500"/>
+<img src="https://i.imgur.com/vej5rqM.png" width="500"/>
 </div>
 
 
