@@ -26,8 +26,8 @@ Application key points:
 - Backward compatible with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project)
 - Tag named `object_id` is used for backward compatibility with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project)
 - Dataset structure and names remain unchanged
-- Result project name format: "{original_project_name}(images)"
-- Image name format: "{video_name}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg"
+- Result project name format: `"{original_project_name}(images)"`
+- Image name format: `"{video_name}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg"`
 - Video tags (both properties and frame range tags) are assigned to corresponding images and objects
 - Information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. 
 
