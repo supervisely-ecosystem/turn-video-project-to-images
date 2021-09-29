@@ -1,10 +1,20 @@
 <div>
-    <b>Overview:</b>
-    <ul>
-        <li>Only labeled video frames are converted</li>
-        <li>Result project name = original name + "(images)" suffix</li>
-        <li>Dataset structure and names remain unchanged</li>
-        <li>Image name format: "{}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg"</li>
-        <li>Video tags (both properties and frame range tags) are assigned to corresponding images and objects</li>
-    </ul>
+
+    <sly-field title="Choose whether to transform all video frames or only annotated frames">
+        <el-select v-model="state.Options">
+            <el-option key="all" label="All video frames" value="all"></el-option>
+            <el-option key="annotated" label="Only annotated video frames" value="annotated"></el-option>
+        </el-select>
+    </sly-field>
+
+    <div v-if="!state.allDatasets">
+        <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
+                            :options="{multiple: true}"></sly-select-dataset>
+    </div>
+    <div class="fflex align-start">
+        <el-checkbox v-model="state.allDatasets" class="mt10 mr10"></el-checkbox>
+        <sly-field class="mt20" title="All datasets"
+                   description="Transform all datasets from project">
+        </sly-field>
+    </div>
 </div>

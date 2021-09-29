@@ -1,7 +1,7 @@
 <div align="center" markdown>
 <img src="https://i.imgur.com/FbUmpLU.png"/>
 
-# Turn videos project into images project
+# Videos project to images project
 
 <p align="center">
   <a href="#Overview">Overview</a> •
@@ -20,18 +20,43 @@
 
 ## Overview
 
-Application converts all labeled video frames (both tags and figures) to images project. Additionaly, information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. 
+Transforms supervisely **videos** project to supervisely **images** project. 
 
-Image names have the following format: `{}_frame_{:05d}.jpg`, for example `my_video_frame_00077.jpg`. Video tags (both properties and frame range tags) are assigned to corresponding images and objects
+Application key points:  
+- Adds additional `object_id` tag to objects for backward compatibility with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project). It's recommended to not have `object_id` tag in the source project.
+- Backward compatible with [Images project to videos project](https://ecosystem.supervise.ly/apps/images-project-to-videos-project)
+- Result project name = original name + "(images)" suffix
+- Dataset structure and names remain unchanged
+- Image name format: "{}_frame_{:05d}.jpg", for example "my_video_frame_00077.jpg"
+- Video tags (both properties and frame range tags) are assigned to corresponding images and objects
+- Ability to convert only labeled video frames
+- Information about original video project (`video_id`, `video_name`, `frame_index`, `video_dataset_id`, `video_dataset_name`, `video_project_id`, `video_project_name`) is assigned to every image as metadata. 
+
+
 
 <img src="https://i.imgur.com/7zQQVFA.png"/>
 
-## How To Use
+# How To Use 
 
-**Step 1:** Add app to your team from Ecosystem if it is not there
+1. Add [Videos project to images project](https://ecosystem.supervise.ly/apps/turn-video-project-into-images) to your team from Ecosystem.
 
-**Step 2:** Run app from the context menu of video project
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/turn-video-project-into-images" src="https://i.imgur.com/9gUzdYM.png" width="350px" style='padding-bottom: 20px'/>  
 
-<img src="https://i.imgur.com/WZV7kdJ.png" width="500px"/>
+2. Run app from the context menu of **Videos Project**:
 
-**Step 3:** Wait until the task is finished, new project with `name` = `original name` + `(images)` suffix is created in the same workspace. Link to project is available in task output column
+<img src="https://i.imgur.com/rckw2ZP.png" width="100%"/>
+
+3. Check the box if you need only annotated video frames, select datasets and press the `Run` button.
+ 
+<div align="center" markdown>
+<img src="https://i.imgur.com/vej5rqM.png" width="500"/>
+</div>
+
+
+# Results
+
+After running the application, you will be redirected to the `Tasks` page.  
+Once application processing has finished, your project will be available.  
+Click on the `project name` to proceed to it.
+
+<img src="https://i.imgur.com/ADEnjJd.png"/>
