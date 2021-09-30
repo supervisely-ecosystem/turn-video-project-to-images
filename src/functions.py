@@ -1,5 +1,8 @@
+import os
+import cv2
 import globals as g
 import supervisely_lib as sly
+from supervisely_lib.io.fs import remove_dir
 
 
 def upload_and_reset(api: sly.Api, dataset_id, names, images, anns, metas, progress):
@@ -29,3 +32,33 @@ def convert_tags(tags, prop_container, frame_container, frame_indices=None):
 def add_object_id_tag(vobject_id, prop_container):
     vobj_id_tag = sly.Tag(g.vobj_id_tag_meta, value=vobject_id)
     prop_container.append(vobj_id_tag)
+
+
+def optimize_download(frames_count, frames):
+    total = int(frames_count * g.label_treshold_percent)
+    if frames >= total:
+        need_optimization = True
+    else:
+        need_optimization = False
+    return need_optimization
+
+
+def vid_to_imgs(dataset_name, video_path):
+    images = []
+    image_paths = []
+    vidcap = cv2.VideoCapture(video_path)
+    success, image = vidcap.read()
+    count = 1
+    while success:
+        image_name = dataset_name + "_" + str(count).zfill(5) + ".png"
+        image_path = os.path.join(g.img_dir, image_name)
+        image_paths.append(image_path)
+        cv2.imwrite(image_path, image)
+
+        im = cv2.imread(image_path)
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+        images.append(im)
+        success, image = vidcap.read()
+        count += 1
+    remove_dir(g.storage_dir)
+    return images

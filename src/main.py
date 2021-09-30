@@ -24,8 +24,15 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 name = sly.fs.get_file_name(video_info.name)
                 ann_info = api.video.annotation.download(video_info.id)
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
-                frames_to_convert = []
 
+                need_optimization = f.optimize_download(video_info.frames_count, len(ann.frames))
+                images = None
+                if need_optimization is True or g.OPTIONS == "all":
+                    video_path = os.path.join(g.video_dir, video_info.name)
+                    api.video.download_path(video_info.id, video_path)
+                    images = f.vid_to_imgs(dataset_name, video_path)
+
+                frames_to_convert = []
                 video_props = []
                 video_frame_tags = defaultdict(list)
                 f.convert_tags(ann.tags, video_props, video_frame_tags, frames_to_convert)
@@ -33,7 +40,6 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 object_props = defaultdict(list)
                 for vobject in ann.objects:
                     f.convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
-
                     vobject_id = key_id_map.get_object_id(vobject.key())
                     f.add_object_id_tag(vobject_id, object_props[vobject.key()])
 
@@ -44,14 +50,17 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 else:
                     frames_to_convert = list(range(0, video_info.frames_count))
 
+                if need_optimization is False and g.OPTIONS == "annotated":
+                    images = []
                 names = []
-                images = []
                 metas = []
                 anns = []
                 progress = sly.Progress("Video: {!r}".format(video_info.name), len(frames_to_convert))
                 for frame_index in frames_to_convert:
                     names.append('{}_frame_{:05d}.jpg'.format(name, frame_index))
-                    images.append(api.video.frame.download_np(video_info.id, frame_index))
+                    if need_optimization is False and g.OPTIONS == "annotated":
+                        images.append(api.video.frame.download_np(video_info.id, frame_index))
+
                     metas.append({
                         "video_id": video_info.id,
                         "video_name": video_info.name,
@@ -75,8 +84,8 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
                     anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
 
-                    if len(names) >= 5:
-                        f.upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
+                    #if len(names) >= 5:
+                    #    f.upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
                 f.upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
     g.my_app.stop()
 
