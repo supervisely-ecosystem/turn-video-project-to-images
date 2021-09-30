@@ -43,11 +43,12 @@ def optimize_download(frames_count, frames):
     return need_optimization
 
 
-def vid_to_imgs(dataset_name, video_path):
+def vid_to_imgs(dataset_name, video_path, total_frames):
     image_paths = []
     vidcap = cv2.VideoCapture(video_path)
     success, image = vidcap.read()
     count = 1
+    progress = sly.Progress("Converting frames to images", total_frames)
     while success:
         image_name = dataset_name + "_" + str(count).zfill(5) + ".png"
         image_path = os.path.join(g.img_dir, image_name)
@@ -56,5 +57,6 @@ def vid_to_imgs(dataset_name, video_path):
 
         success, image = vidcap.read()
         count += 1
+        progress.iter_done_report()
     remove_dir(g.video_dir)
     return image_paths

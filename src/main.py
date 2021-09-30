@@ -31,7 +31,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 if need_optimization is True or g.OPTIONS == "all":
                     video_path = os.path.join(g.video_dir, video_info.name)
                     api.video.download_path(video_info.id, video_path)
-                    image_paths = f.vid_to_imgs(dataset_name, video_path)
+                    image_paths = f.vid_to_imgs(dataset_name, video_path, video_info.frames_count)
 
                 frames_to_convert = []
                 video_props = []
