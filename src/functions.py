@@ -36,7 +36,7 @@ def add_object_id_tag(vobject_id, prop_container):
 
 def optimize_download(frames_count, frames):
     total = int(frames_count * g.label_treshold_percent)
-    if frames >= total:
+    if frames > total:
         need_optimization = True
     else:
         need_optimization = False
