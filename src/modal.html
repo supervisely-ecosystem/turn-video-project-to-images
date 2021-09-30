@@ -7,14 +7,15 @@
         </el-select>
     </sly-field>
 
-    <div v-if="!state.allDatasets">
-        <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
-                            :options="{multiple: true}"></sly-select-dataset>
-    </div>
+
     <div class="fflex align-start">
         <el-checkbox v-model="state.allDatasets" class="mt10 mr10"></el-checkbox>
         <sly-field class="mt20" title="All datasets"
                    description="Transform all datasets from project">
         </sly-field>
+    </div>
+    <div v-if="!state.allDatasets">
+        <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
+                            :options="{multiple: true}"></sly-select-dataset>
     </div>
 </div>
