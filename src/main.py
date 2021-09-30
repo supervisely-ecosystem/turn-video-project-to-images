@@ -1,4 +1,5 @@
 import os
+import cv2
 from collections import defaultdict
 import supervisely_lib as sly
 from supervisely_lib.video_annotation.key_id_map import KeyIdMap
@@ -26,11 +27,11 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
 
                 need_optimization = f.optimize_download(video_info.frames_count, len(ann.frames))
-                images = None
+                image_paths = None
                 if need_optimization is True or g.OPTIONS == "all":
                     video_path = os.path.join(g.video_dir, video_info.name)
                     api.video.download_path(video_info.id, video_path)
-                    images = f.vid_to_imgs(dataset_name, video_path)
+                    image_paths = f.vid_to_imgs(dataset_name, video_path)
 
                 frames_to_convert = []
                 video_props = []
@@ -50,9 +51,8 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 else:
                     frames_to_convert = list(range(0, video_info.frames_count))
 
-                if need_optimization is False and g.OPTIONS == "annotated":
-                    images = []
                 names = []
+                images = []
                 metas = []
                 anns = []
                 progress = sly.Progress("Video: {!r}".format(video_info.name), len(frames_to_convert))
@@ -60,6 +60,10 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     names.append('{}_frame_{:05d}.jpg'.format(name, frame_index))
                     if need_optimization is False and g.OPTIONS == "annotated":
                         images.append(api.video.frame.download_np(video_info.id, frame_index))
+                    else:
+                        im = cv2.imread(image_paths[frame_index])
+                        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+                        images.append(im)
 
                     metas.append({
                         "video_id": video_info.id,
@@ -84,8 +88,8 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
                     anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
 
-                    #if len(names) >= 5:
-                    #    f.upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
+                    if len(names) >= 5:
+                        f.upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
                 f.upload_and_reset(api, dst_dataset.id, names, images, anns, metas, progress)
     g.my_app.stop()
 

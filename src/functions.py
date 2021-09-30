@@ -44,7 +44,6 @@ def optimize_download(frames_count, frames):
 
 
 def vid_to_imgs(dataset_name, video_path):
-    images = []
     image_paths = []
     vidcap = cv2.VideoCapture(video_path)
     success, image = vidcap.read()
@@ -55,10 +54,7 @@ def vid_to_imgs(dataset_name, video_path):
         image_paths.append(image_path)
         cv2.imwrite(image_path, image)
 
-        im = cv2.imread(image_path)
-        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-        images.append(im)
         success, image = vidcap.read()
         count += 1
-    remove_dir(g.storage_dir)
-    return images
+    remove_dir(g.video_dir)
+    return image_paths
