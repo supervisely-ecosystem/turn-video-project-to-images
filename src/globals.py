@@ -1,6 +1,8 @@
 import os
 import json
 import supervisely_lib as sly
+from supervisely_lib.io.fs import mkdir
+
 
 my_app = sly.AppService()
 api: sly.Api = my_app.public_api
@@ -14,6 +16,15 @@ SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replac
 ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ('true', '1', 't')
 if ALL_DATASETS:
     SELECTED_DATASETS = [dataset.name for dataset in api.dataset.get_list(PROJECT_ID)]
+
+need_download_threshold = 0.15
+
+storage_dir = os.path.join(my_app.data_dir, "sly_base_sir")
+mkdir(storage_dir, True)
+video_dir = os.path.join(storage_dir, "video")
+mkdir(video_dir)
+img_dir = os.path.join(storage_dir, "images")
+mkdir(img_dir)
 
 project = api.project.get_info_by_id(PROJECT_ID)
 if project is None:
