@@ -5,16 +5,12 @@ import supervisely_lib as sly
 from supervisely_lib.io.fs import remove_dir
 
 
-def upload_and_reset(api: sly.Api, dataset_id, names, images, anns, metas, progress):
+def upload_frames(api: sly.Api, dataset_id, names, images_paths, anns, metas, progress):
     if len(names) > 0:
-        new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas)
+        new_image_infos = api.image.upload_paths(dataset_id, names, images_paths, metas=metas)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
         progress.iters_done_report(len(names))
-    del names[:]
-    del images[:]
-    del anns[:]
-    del metas[:]
 
 
 def convert_tags(tags, prop_container, frame_container, frame_indices=None):
@@ -34,32 +30,39 @@ def add_object_id_tag(vobject_id, prop_container):
     prop_container.append(vobj_id_tag)
 
 
-def need_download(total_frames, total_annotated_frames):
-    frames_threshold = int(total_frames * g.label_threshold_percent)
+def need_download_video(total_frames, total_annotated_frames):
+    frames_threshold = int(total_frames * g.need_download_threshold)
     if total_annotated_frames > frames_threshold:
         return True
     return False
 
 
-def video_to_images(dataset_name, video_path, frames_to_convert): ## convert only len treshold frames?
+def get_frames_from_video(dataset_name, video_path, frames_to_convert): ## convert only len treshold frames?
+    image_names = []
     image_paths = []
     vidcap = cv2.VideoCapture(video_path)
-    success, image = vidcap.read()
-    count = 1
-    progress = sly.Progress("Converting frames to images", len(frames_to_convert))
-    while success:
-        if count - 1 in frames_to_convert:
-            image_name = dataset_name + "_" + str(count - 1).zfill(5) + ".png"
-            image_path = os.path.join(g.img_dir, image_name)
-            image_paths.append(image_path)
-            cv2.imwrite(image_path, image)
+    progress = sly.Progress("Extracting video frames", len(frames_to_convert))
+    for frame_number in frames_to_convert:
+        image_name = dataset_name + "_" + str(frame_number).zfill(5) + ".jpg"
+        image_names.append(image_name)
+        image_path = os.path.join(g.img_dir, image_name)
+        image_paths.append(image_path)
+        vidcap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+        success, image = vidcap.read()
+        cv2.imwrite(image_path, image)
+        progress.iter_done_report()
+    return image_names, image_paths
 
-            success, image = vidcap.read()
-            count += 1
-            progress.iter_done_report()
-        else:
-            success, image = vidcap.read()
-            count += 1
-            image_paths.append(None)
-    remove_dir(g.video_dir)
-    return image_paths
+
+def get_frames_from_api(api, video_id, dataset_name, frames_to_convert):
+    image_names = []
+    images_paths = []
+    progress = sly.Progress("Extracting frames video", len(frames_to_convert))
+    for frame_index in frames_to_convert:
+        image_name = dataset_name + "_" + str(frame_index).zfill(5) + ".jpg"
+        image_names.append(image_name)
+        image_path = os.path.join(g.img_dir, image_name)
+        api.video.frame.download_path(video_id, frame_index, image_path)
+        images_paths.append(image_path)
+        progress.iter_done_report()
+    return image_names, images_paths
