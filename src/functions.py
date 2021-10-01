@@ -37,13 +37,13 @@ def need_download_video(total_frames, total_annotated_frames):
     return False
 
 
-def get_frames_from_video(dataset_name, video_path, frames_to_convert): ## convert only len treshold frames?
+def get_frames_from_video(video_name, video_path, frames_to_convert):
     image_names = []
     image_paths = []
     vidcap = cv2.VideoCapture(video_path)
     progress = sly.Progress("Extracting video frames", len(frames_to_convert))
     for frame_number in frames_to_convert:
-        image_name = dataset_name + "_" + str(frame_number).zfill(5) + ".jpg"
+        image_name = video_name + "_" + str(frame_number).zfill(5) + ".jpg"
         image_names.append(image_name)
         image_path = os.path.join(g.img_dir, image_name)
         image_paths.append(image_path)
@@ -54,12 +54,12 @@ def get_frames_from_video(dataset_name, video_path, frames_to_convert): ## conve
     return image_names, image_paths
 
 
-def get_frames_from_api(api, video_id, dataset_name, frames_to_convert):
+def get_frames_from_api(api, video_id, video_name, frames_to_convert):
     image_names = []
     images_paths = []
     progress = sly.Progress("Extracting video frames", len(frames_to_convert))
     for frame_index in frames_to_convert:
-        image_name = dataset_name + "_" + str(frame_index).zfill(5) + ".jpg"
+        image_name = video_name + "_" + str(frame_index).zfill(5) + ".jpg"
         image_names.append(image_name)
         image_path = os.path.join(g.img_dir, image_name)
         api.video.frame.download_path(video_id, frame_index, image_path)
