@@ -34,29 +34,32 @@ def add_object_id_tag(vobject_id, prop_container):
     prop_container.append(vobj_id_tag)
 
 
-def optimize_download(frames_count, frames):
-    total = int(frames_count * g.label_treshold_percent)
-    if frames > total:
-        need_optimization = True
-    else:
-        need_optimization = False
-    return need_optimization
+def need_download(total_frames, total_annotated_frames):
+    frames_threshold = int(total_frames * g.label_threshold_percent)
+    if total_annotated_frames > frames_threshold:
+        return True
+    return False
 
 
-def vid_to_imgs(dataset_name, video_path, total_frames):
+def video_to_images(dataset_name, video_path, frames_to_convert): ## convert only len treshold frames?
     image_paths = []
     vidcap = cv2.VideoCapture(video_path)
     success, image = vidcap.read()
     count = 1
-    progress = sly.Progress("Converting frames to images", total_frames)
+    progress = sly.Progress("Converting frames to images", len(frames_to_convert))
     while success:
-        image_name = dataset_name + "_" + str(count).zfill(5) + ".png"
-        image_path = os.path.join(g.img_dir, image_name)
-        image_paths.append(image_path)
-        cv2.imwrite(image_path, image)
+        if count - 1 in frames_to_convert:
+            image_name = dataset_name + "_" + str(count - 1).zfill(5) + ".png"
+            image_path = os.path.join(g.img_dir, image_name)
+            image_paths.append(image_path)
+            cv2.imwrite(image_path, image)
 
-        success, image = vidcap.read()
-        count += 1
-        progress.iter_done_report()
+            success, image = vidcap.read()
+            count += 1
+            progress.iter_done_report()
+        else:
+            success, image = vidcap.read()
+            count += 1
+            image_paths.append(None)
     remove_dir(g.video_dir)
     return image_paths

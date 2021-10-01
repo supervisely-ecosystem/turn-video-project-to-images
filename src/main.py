@@ -26,12 +26,12 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 ann_info = api.video.annotation.download(video_info.id)
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
 
-                need_optimization = f.optimize_download(video_info.frames_count, len(ann.frames))
+                need_download = f.need_download(video_info.frames_count, len(ann.frames))
+                video_path = None
                 image_paths = None
-                if need_optimization is True or g.OPTIONS == "all":
+                if need_download is True or g.OPTIONS == "all":
                     video_path = os.path.join(g.video_dir, video_info.name)
                     api.video.download_path(video_info.id, video_path)
-                    image_paths = f.vid_to_imgs(dataset_name, video_path, video_info.frames_count)
 
                 frames_to_convert = []
                 video_props = []
@@ -51,6 +51,9 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 else:
                     frames_to_convert = list(range(0, video_info.frames_count))
 
+                if need_download:
+                    image_paths = f.video_to_images(dataset_name, video_path, frames_to_convert)
+
                 names = []
                 images = []
                 metas = []
@@ -58,7 +61,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 progress = sly.Progress("Video: {!r}".format(video_info.name), len(frames_to_convert))
                 for frame_index in frames_to_convert:
                     names.append('{}_frame_{:05d}.jpg'.format(name, frame_index))
-                    if need_optimization is False and g.OPTIONS == "annotated":
+                    if need_download is False and g.OPTIONS == "annotated":
                         images.append(api.video.frame.download_np(video_info.id, frame_index))
                     else:
                         im = cv2.imread(image_paths[frame_index])

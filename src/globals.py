@@ -17,7 +17,7 @@ ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ('true', '1', 't'
 if ALL_DATASETS:
     SELECTED_DATASETS = [dataset.name for dataset in api.dataset.get_list(PROJECT_ID)]
 
-label_treshold_percent = 0.10
+label_threshold_percent = 0.15
 
 storage_dir = os.path.join(my_app.data_dir, "sly_base_sir")
 mkdir(storage_dir, True)
