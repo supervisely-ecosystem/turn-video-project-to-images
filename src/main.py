@@ -24,7 +24,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 ann_info = api.video.annotation.download(video_info.id)
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
                 if g.OPTIONS == "annotated" and len(ann.tags) == 0 and len(ann.frames) == 0:
-                    g.my_app.logger.warn(f"Video {video_info.name} annotation is empty")
+                    g.my_app.logger.warn(f"Video {video_info.name} annotation is empty in Dataset {dataset_name}")
                     continue
 
                 need_download_video = f.need_download_video(video_info.frames_count, len(ann.frames))
