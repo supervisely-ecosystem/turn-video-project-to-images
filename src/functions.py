@@ -57,7 +57,7 @@ def get_frames_from_video(dataset_name, video_path, frames_to_convert): ## conve
 def get_frames_from_api(api, video_id, dataset_name, frames_to_convert):
     image_names = []
     images_paths = []
-    progress = sly.Progress("Extracting frames video", len(frames_to_convert))
+    progress = sly.Progress("Extracting video frames", len(frames_to_convert))
     for frame_index in frames_to_convert:
         image_name = dataset_name + "_" + str(frame_index).zfill(5) + ".jpg"
         image_names.append(image_name)
