@@ -8,6 +8,7 @@ import functions as f
 
 from time import time
 
+
 @g.my_app.callback("turn_into_images_project")
 @sly.timeit
 def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
@@ -58,7 +59,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     if need_download_video or g.OPTIONS == "all":
                         local_time = time()
                         images_names, images = f.get_frames_from_video(video_info.name, video_path, batch_frames)
-                        print(f'{time() - local_time} one batch time native')
+                        print(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
                     else:
                         images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
