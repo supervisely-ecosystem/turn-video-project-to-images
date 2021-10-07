@@ -55,9 +55,9 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     metas = []
                     anns = []
                     if need_download_video or g.OPTIONS == "all":
-                        images_names, images_paths = f.get_frames_from_video(video_info.name, video_path, batch_frames)
+                        images_names, images = f.get_frames_from_video(video_info.name, video_path, batch_frames)
                     else:
-                        images_names, images_paths = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
+                        images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
                         metas.append({
                             "video_id": video_info.id,
@@ -81,7 +81,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                         img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
                         anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
-                    f.upload_frames(api, dst_dataset.id, images_names, images_paths, anns, metas, progress)
+                    f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas, progress)
     g.my_app.stop()
 
 

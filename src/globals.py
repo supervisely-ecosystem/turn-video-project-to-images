@@ -4,6 +4,8 @@ import supervisely_lib as sly
 from supervisely_lib.io.fs import mkdir
 
 
+logger = sly.logger
+
 my_app = sly.AppService()
 api: sly.Api = my_app.public_api
 

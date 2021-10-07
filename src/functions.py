@@ -5,9 +5,9 @@ import supervisely_lib as sly
 from supervisely_lib.io.fs import remove_dir
 
 
-def upload_frames(api: sly.Api, dataset_id, names, images_paths, anns, metas, progress):
+def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, progress):
     if len(names) > 0:
-        new_image_infos = api.image.upload_paths(dataset_id, names, images_paths, metas=metas)
+        new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
         progress.iters_done_report(len(names))
@@ -39,30 +39,29 @@ def need_download_video(total_frames, total_annotated_frames):
 
 def get_frames_from_video(video_name, video_path, frames_to_convert):
     image_names = []
-    image_paths = []
+    images = []
     vidcap = cv2.VideoCapture(video_path)
 #     progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
     for frame_number in frames_to_convert:
         image_name = video_name + "_" + str(frame_number).zfill(5) + ".jpg"
         image_names.append(image_name)
-        image_path = os.path.join(g.img_dir, image_name)
-        image_paths.append(image_path)
+
         vidcap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
         success, image = vidcap.read()
-        cv2.imwrite(image_path, image)
+        images.append(image)
 #         progress.iter_done_report()
-    return image_names, image_paths
+    return image_names, images
 
 
 def get_frames_from_api(api, video_id, video_name, frames_to_convert):
     image_names = []
-    images_paths = []
+    images = []
 #     progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
     for frame_index in frames_to_convert:
         image_name = video_name + "_" + str(frame_index).zfill(5) + ".jpg"
         image_names.append(image_name)
-        image_path = os.path.join(g.img_dir, image_name)
-        api.video.frame.download_path(video_id, frame_index, image_path)
-        images_paths.append(image_path)
+
+        image = api.video.frame.download_np(video_id, frame_index)
+        images.append(image)
 #         progress.iter_done_report()
-    return image_names, images_paths
+    return image_names, images
