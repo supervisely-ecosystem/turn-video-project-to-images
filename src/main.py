@@ -29,7 +29,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                 need_download_video = f.need_download_video(video_info.frames_count, len(ann.frames))
                 video_path = None
-                if need_download_video is True or g.OPTIONS == "all":
+                if need_download_video or g.OPTIONS == "all":
                     video_path = os.path.join(g.video_dir, video_info.name)
                     api.video.download_path(video_info.id, video_path)
 
@@ -54,7 +54,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 for batch_frames in sly.batched(frames_to_convert):
                     metas = []
                     anns = []
-                    if need_download_video:
+                    if need_download_video or g.OPTIONS == "all":
                         images_names, images_paths = f.get_frames_from_video(video_info.name, video_path, batch_frames)
                     else:
                         images_names, images_paths = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
