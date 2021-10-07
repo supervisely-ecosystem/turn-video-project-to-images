@@ -41,7 +41,7 @@ def get_frames_from_video(video_name, video_path, frames_to_convert):
     image_names = []
     image_paths = []
     vidcap = cv2.VideoCapture(video_path)
-    progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
+#     progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
     for frame_number in frames_to_convert:
         image_name = video_name + "_" + str(frame_number).zfill(5) + ".jpg"
         image_names.append(image_name)
@@ -50,19 +50,19 @@ def get_frames_from_video(video_name, video_path, frames_to_convert):
         vidcap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
         success, image = vidcap.read()
         cv2.imwrite(image_path, image)
-        progress.iter_done_report()
+#         progress.iter_done_report()
     return image_names, image_paths
 
 
 def get_frames_from_api(api, video_id, video_name, frames_to_convert):
     image_names = []
     images_paths = []
-    progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
+#     progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
     for frame_index in frames_to_convert:
         image_name = video_name + "_" + str(frame_index).zfill(5) + ".jpg"
         image_names.append(image_name)
         image_path = os.path.join(g.img_dir, image_name)
         api.video.frame.download_path(video_id, frame_index, image_path)
         images_paths.append(image_path)
-        progress.iter_done_report()
+#         progress.iter_done_report()
     return image_names, images_paths
