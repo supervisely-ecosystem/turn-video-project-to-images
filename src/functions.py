@@ -103,7 +103,7 @@ def get_frames_from_video(video_name, video_path, frames_to_convert):
         image_names.append(image_name)
 
         # vidcap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-        image = vidcap.read()
+        image = vidcap.read()[..., ::-1]  # BGR to RGB
         images.append(image)
     #         progress.iter_done_report()
 
