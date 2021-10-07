@@ -7,7 +7,17 @@
         </el-select>
     </sly-field>
 
-
+    <sly-field title="Batch size">
+<!--        <el-slider-->
+<!--                class="ml5 mr5"-->
+<!--                v-model="state.batchSize"-->
+<!--                :step="100"-->
+<!--                :min="100"-->
+<!--                :max="1000"-->
+<!--                show-stops>-->
+<!--        </el-slider>-->
+        <el-input-number v-model="state.batchSize" :min="32" :max="2048"></el-input-number>
+    </sly-field>
     <div class="fflex align-start">
         <el-checkbox v-model="state.allDatasets" class="mt10 mr10"></el-checkbox>
         <sly-field class="mt20" title="All datasets"

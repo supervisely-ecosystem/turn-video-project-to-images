@@ -14,6 +14,8 @@ WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
 
 OPTIONS = os.environ['modal.state.Options']
+BATCH_SIZE = os.environ['modal.state.batchSize']
+
 SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
 ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ('true', '1', 't')
 if ALL_DATASETS:

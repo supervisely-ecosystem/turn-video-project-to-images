@@ -6,6 +6,7 @@ from supervisely_lib.video_annotation.key_id_map import KeyIdMap
 import globals as g
 import functions as f
 
+from time import time
 
 @g.my_app.callback("turn_into_images_project")
 @sly.timeit
@@ -51,11 +52,13 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     frames_to_convert = list(range(0, video_info.frames_count))
 
                 progress = sly.Progress("Processing video frames: {!r}".format(video_info.name), len(frames_to_convert))
-                for batch_frames in sly.batched(frames_to_convert):
+                for batch_frames in sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE):
                     metas = []
                     anns = []
                     if need_download_video or g.OPTIONS == "all":
+                        local_time = time()
                         images_names, images = f.get_frames_from_video(video_info.name, video_path, batch_frames)
+                        print(f'{time() - local_time} one batch time native')
                     else:
                         images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
