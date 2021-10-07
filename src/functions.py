@@ -9,14 +9,16 @@ from threading import Thread
 
 
 class FileVideoStream:
-    def __init__(self, path, queueSize=128):
+    def __init__(self, path, actual_frames):
         # initialize the file video stream along with the boolean
         # used to indicate if the thread should be stopped or not
         self.stream = cv2.VideoCapture(path)
+        self.stream.set(cv2.CAP_PROP_POS_FRAMES, actual_frames[0])
+        self.actual_frames = actual_frames
         self.stopped = False
         # initialize the queue used to store frames read from
         # the video file
-        self.Q = Queue(maxsize=queueSize)
+        self.Q = Queue(maxsize=len(actual_frames))
 
     def start(self):
         # start a thread to read frames from the file video stream
@@ -27,7 +29,7 @@ class FileVideoStream:
 
     def update(self):
         # keep looping infinitely
-        while True:
+        for _ in self.actual_frames:
             # if the thread indicator variable is set, stop the
             # thread
             if self.stopped:
@@ -35,6 +37,7 @@ class FileVideoStream:
             # otherwise, ensure the queue has room in it
             if not self.Q.full():
                 # read the next frame from the file
+
                 (grabbed, frame) = self.stream.read()
                 # if the `grabbed` boolean is `False`, then we have
                 # reached the end of the video file
@@ -93,7 +96,7 @@ def get_frames_from_video(video_name, video_path, frames_to_convert):
     image_names = []
     images = []
     # vidcap = cv2.VideoCapture(video_path)
-    vidcap = FileVideoStream(path=video_path, queueSize=len(frames_to_convert)).start()
+    vidcap = FileVideoStream(path=video_path, actual_frames=frames_to_convert).start()
     #     progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
     for frame_number in frames_to_convert:
         image_name = video_name + "_" + str(frame_number).zfill(5) + ".jpg"
