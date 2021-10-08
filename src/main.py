@@ -119,7 +119,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         g.logger.debug(f'{len(images)} frames distorted')
 
                     f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas,
-                                    f'{batch_index} / {int(len(frames_to_convert) / g.BATCH_SIZE)}')
+                                    f'{batch_index}/{int(len(frames_to_convert) / g.BATCH_SIZE)}')
                     progress.iters_done_report(len(images_names))
 
                 # g.logger.debug(f'total images size for video: {total_images_size} MB')

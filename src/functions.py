@@ -60,7 +60,7 @@ def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, current_
     if len(names) > 0:
         local_time = time()
 
-        progress_cb = get_progress_cb(f"Processing batch {current_batch}", len(images), is_size=False)
+        progress_cb = get_progress_cb(f"Processing batch {current_batch}:", len(images), is_size=False)
         new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas, progress_cb=progress_cb)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
