@@ -134,6 +134,9 @@ def stop(api: sly.Api, task_id, context, state, app_logger):
 
 
 def main():
+    if g.LOG_LEVEL == 'debug':
+        g.logger.debug(f'DEBUG MODE ACTIVATED, we will add 50 random pixels to distort images')
+
     sly.logger.info("Script arguments", extra={
         "TEAM_ID": g.TEAM_ID,
         "WORKSPACE_ID": g.WORKSPACE_ID,
