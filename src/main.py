@@ -1,3 +1,4 @@
+import io
 import os
 from collections import defaultdict
 import supervisely_lib as sly
@@ -25,6 +26,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
         videos = api.video.get_list(dataset.id)
         for batch in sly.batched(videos):
             for video_info in batch:
+                general_time = time()
                 ann_info = api.video.annotation.download(video_info.id)
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
                 if g.OPTIONS == "annotated" and len(ann.tags) == 0 and len(ann.frames) == 0:
@@ -72,13 +74,13 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                         g.logger.debug(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
 
-                        images_size = sum([sys.getsizeof(current_image) for current_image in images]) \
-                                      / (1024 * 1024)  # in MegaBytes
+                        # io_buf =
+                        images_size = f.calculate_batch_size(images) / (1024 * 1024)  # in MegaBytes
 
                         g.logger.debug(f'batch size: {images_size} MB')
                         g.logger.debug(f'mean item size: {images_size / len(images)} MB')
 
-                        total_images_size += 0
+                        total_images_size += images_size
                     else:
                         images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
@@ -111,7 +113,9 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         g.logger.debug(f'{len(images)} frames distorted')
 
                     f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas, progress)
-                    g.logger.debug(f'total images size for video: {total_images_size} MB')
+
+                g.logger.debug(f'total images size for video: {total_images_size} MB')
+                g.logger.info(f'video {video_info.name} converted in {time() - general_time} seconds')
     g.my_app.stop()
 
 

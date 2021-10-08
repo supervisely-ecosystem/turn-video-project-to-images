@@ -1,5 +1,6 @@
 import os
 import random
+from io import BytesIO
 
 import cv2
 import globals as g
@@ -58,7 +59,9 @@ class FileVideoStream:
 def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, progress):
     if len(names) > 0:
         local_time = time()
-        new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas)
+
+        progress_cb = get_progress_cb("Processing batch", len(images), is_size=False)
+        new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas, progress_cb=None)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
         g.logger.debug(f'batch uploaded in {time() - local_time} seconds')
@@ -126,7 +129,7 @@ def get_frames_from_api(api, video_id, video_name, frames_to_convert):
 
 def get_progress_cb(message, total, is_size=False):
     progress = sly.Progress(message, total, is_size=is_size)
-    progress_cb = partial(update_progress, api=g.api, task_id=g.TASK_ID, progress=progress)
+    progress_cb = partial(update_progress, api=g.api, task_id=g.my_app.task_id, progress=progress)
     progress_cb(0)
     return progress_cb
 
@@ -159,3 +162,16 @@ def distort_frames(images):
                   random.randint(0, image.shape[1] - 1),
                   random.randint(0, image.shape[2] - 1)] = random.randint(0, 255)
 
+
+def calculate_batch_size(images_batch):
+    from PIL import Image
+    batch_size = 0
+
+    for image in images_batch:
+        img = Image.fromarray(image)
+        img_file = BytesIO()
+        img.save(img_file, 'jpeg')
+        img_file_size_jpeg = img_file.tell()
+        batch_size += img_file_size_jpeg
+
+    return batch_size
