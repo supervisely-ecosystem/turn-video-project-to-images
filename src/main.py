@@ -74,13 +74,19 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                         g.logger.debug(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
 
-                        # io_buf =
-                        images_size = f.calculate_batch_size(images) / (1024 * 1024)  # in MegaBytes
 
+                        """
+                        too slow calculations, for extreme debug
+                        
+                        
+                        images_size = f.calculate_batch_size(images) / (1024 * 1024)  # in MegaBytes
+                        
                         g.logger.debug(f'batch size: {images_size} MB')
                         g.logger.debug(f'mean item size: {images_size / len(images)} MB')
 
                         total_images_size += images_size
+                        """
+
                     else:
                         images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
@@ -114,7 +120,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                     f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas, progress)
 
-                g.logger.debug(f'total images size for video: {total_images_size} MB')
+                # g.logger.debug(f'total images size for video: {total_images_size} MB')
                 g.logger.info(f'video {video_info.name} converted in {time() - general_time} seconds')
     g.my_app.stop()
 
