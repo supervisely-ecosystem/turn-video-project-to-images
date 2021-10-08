@@ -65,7 +65,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 progress = sly.Progress("Processing video frames: {!r}".format(video_info.name), len(frames_to_convert))
 
                 total_images_size = 0
-                for batch_frames in sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE):
+                for batch_index, batch_frames in enumerate(sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE)):
                     metas = []
                     anns = []
                     if need_download_video or g.OPTIONS == "all":
@@ -118,7 +118,9 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         f.distort_frames(images)
                         g.logger.debug(f'{len(images)} frames distorted')
 
-                    f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas, progress)
+                    f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas,
+                                    f'{batch_index} / {len(sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE))}')
+                    progress.iters_done_report(len(images_names))
 
                 # g.logger.debug(f'total images size for video: {total_images_size} MB')
                 g.logger.info(f'video {video_info.name} converted in {time() - general_time} seconds')

@@ -56,17 +56,17 @@ class FileVideoStream:
         self.stopped = True
 
 
-def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, progress):
+def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, current_batch):
     if len(names) > 0:
         local_time = time()
 
-        progress_cb = get_progress_cb("Processing batch", len(images), is_size=False)
+        progress_cb = get_progress_cb(f"Processing batch {current_batch}", len(images), is_size=False)
         new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas, progress_cb=progress_cb)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
         g.logger.debug(f'batch uploaded in {time() - local_time} seconds')
 
-        progress.iters_done_report(len(names))
+
 
 
 def convert_tags(tags, prop_container, frame_container, frame_indices=None):
