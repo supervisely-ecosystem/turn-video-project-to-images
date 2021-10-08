@@ -64,7 +64,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
 
                 progress = sly.Progress("Processing video frames: {!r}".format(video_info.name), len(frames_to_convert))
 
-                total_images_size = 0
+                # total_images_size = 0
                 for batch_index, batch_frames in enumerate(sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE)):
                     metas = []
                     anns = []
