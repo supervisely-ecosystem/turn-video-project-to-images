@@ -7,13 +7,15 @@ import globals as g
 import functions as f
 
 from time import time
+import sys
 
 
 @g.my_app.callback("turn_into_images_project")
 @sly.timeit
 def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
     res_project_name = f"{g.project.name}(images)"
-    dst_project = api.project.create(g.WORKSPACE_ID, res_project_name, type=sly.ProjectType.IMAGES, change_name_if_conflict=True)
+    dst_project = api.project.create(g.WORKSPACE_ID, res_project_name, type=sly.ProjectType.IMAGES,
+                                     change_name_if_conflict=True)
     api.project.update_meta(dst_project.id, g.meta.to_json())
 
     key_id_map = KeyIdMap()
@@ -32,8 +34,13 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 need_download_video = f.need_download_video(video_info.frames_count, len(ann.frames))
                 video_path = None
                 if need_download_video or g.OPTIONS == "all":
+                    local_time = time()
                     video_path = os.path.join(g.video_dir, video_info.name)
-                    api.video.download_path(video_info.id, video_path)
+
+                    progress_cb = f.get_progress_cb("Downloading video", int(video_info.file_meta['size']),
+                                                    is_size=True)
+                    api.video.download_path(video_info.id, video_path, progress_cb=progress_cb)
+                    g.logger.info(f'video {video_info.name} downloaded in {time() - local_time} seconds')
 
                 frames_to_convert = []
                 video_props = []
@@ -42,7 +49,8 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 object_frame_tags = defaultdict(lambda: defaultdict(list))
                 object_props = defaultdict(list)
                 for vobject in ann.objects:
-                    f.convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()], frames_to_convert)
+                    f.convert_tags(vobject.tags, object_props[vobject.key()], object_frame_tags[vobject.key()],
+                                   frames_to_convert)
                     vobject_id = key_id_map.get_object_id(vobject.key())
                     f.add_object_id_tag(vobject_id, object_props[vobject.key()])
                 if g.OPTIONS == "annotated":
@@ -53,13 +61,24 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     frames_to_convert = list(range(0, video_info.frames_count))
 
                 progress = sly.Progress("Processing video frames: {!r}".format(video_info.name), len(frames_to_convert))
+
+                total_images_size = 0
                 for batch_frames in sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE):
                     metas = []
                     anns = []
                     if need_download_video or g.OPTIONS == "all":
                         local_time = time()
                         images_names, images = f.get_frames_from_video(video_info.name, video_path, batch_frames)
-                        print(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
+
+                        g.logger.debug(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
+
+                        images_size = sum([sys.getsizeof(current_image) for current_image in images]) \
+                                      / (1024 * 1024)  # in MegaBytes
+
+                        g.logger.debug(f'batch size: {images_size} MB')
+                        g.logger.debug(f'mean item size: {images_size / len(images)} MB')
+
+                        total_images_size += 0
                     else:
                         images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
@@ -78,14 +97,21 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         if frame_annotation is not None:
                             for figure in frame_annotation.figures:
                                 tags_to_assign = object_props[figure.parent_object.key()].copy()
-                                tags_to_assign.extend(object_frame_tags[figure.parent_object.key()].get(frame_index, []).copy())
+                                tags_to_assign.extend(
+                                    object_frame_tags[figure.parent_object.key()].get(frame_index, []).copy())
                                 cur_label = sly.Label(figure.geometry, figure.parent_object.obj_class,
                                                       sly.TagCollection(tags_to_assign))
                                 labels.append(cur_label)
 
                         img_tags = video_props.copy() + video_frame_tags.get(frame_index, []).copy()
                         anns.append(sly.Annotation(ann.img_size, labels=labels, img_tags=sly.TagCollection(img_tags)))
+
+                    if g.LOG_LEVEL == 'debug':
+                        f.distort_frames(images)
+                        g.logger.debug(f'{len(images)} frames distorted')
+
                     f.upload_frames(api, dst_dataset.id, images_names, images, anns, metas, progress)
+                    g.logger.debug(f'total images size for video: {total_images_size} MB')
     g.my_app.stop()
 
 

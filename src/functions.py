@@ -1,4 +1,6 @@
 import os
+import random
+
 import cv2
 import globals as g
 import supervisely_lib as sly
@@ -6,6 +8,9 @@ from supervisely_lib.io.fs import remove_dir
 
 from queue import Queue
 from threading import Thread
+
+from functools import partial
+from time import time
 
 
 class FileVideoStream:
@@ -52,9 +57,12 @@ class FileVideoStream:
 
 def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, progress):
     if len(names) > 0:
+        local_time = time()
         new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas)
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
+        g.logger.debug(f'batch uploaded in {time() - local_time} seconds')
+
         progress.iters_done_report(len(names))
 
 
@@ -114,3 +122,40 @@ def get_frames_from_api(api, video_id, video_name, frames_to_convert):
         images.append(image)
     #         progress.iter_done_report()
     return image_names, images
+
+
+def get_progress_cb(message, total, is_size=False):
+    progress = sly.Progress(message, total, is_size=is_size)
+    progress_cb = partial(update_progress, api=g.api, task_id=g.TASK_ID, progress=progress)
+    progress_cb(0)
+    return progress_cb
+
+
+def update_progress(count, api: sly.Api, task_id, progress: sly.Progress):
+    progress.iters_done_report(count)
+    _update_progress_ui(api, task_id, progress)
+
+
+def _update_progress_ui(api: sly.Api, task_id, progress: sly.Progress, stdout_print=False):
+    if progress.need_report():
+        fields = [
+            {"field": "data.progressName", "payload": progress.message},
+            {"field": "data.currentProgressLabel", "payload": progress.current_label},
+            {"field": "data.totalProgressLabel", "payload": progress.total_label},
+            {"field": "data.currentProgress", "payload": progress.current},
+            {"field": "data.totalProgress", "payload": progress.total},
+        ]
+        api.app.set_fields(task_id, fields)
+        if stdout_print is True:
+            progress.report_if_needed()
+
+
+def distort_frames(images):
+    random.seed(time())
+    for index, image in enumerate(images):
+
+        for _ in range(50):
+            image[random.randint(0, image.shape[0] - 1),
+                  random.randint(0, image.shape[1] - 1),
+                  random.randint(0, image.shape[2] - 1)] = random.randint(0, 255)
+

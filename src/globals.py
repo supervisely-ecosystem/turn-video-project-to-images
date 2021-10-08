@@ -13,6 +13,9 @@ TEAM_ID = int(os.environ['context.teamId'])
 WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
 
+TASK_ID = int(os.environ["TASK_ID"])
+LOG_LEVEL = str(os.environ["LOG_LEVEL"])
+
 OPTIONS = os.environ['modal.state.Options']
 BATCH_SIZE = int(os.environ['modal.state.batchSize'])
 
