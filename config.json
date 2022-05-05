@@ -9,12 +9,20 @@
   "docker_image": "supervisely/base-py-sdk:6.1.96",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
-  "modal_template_state": {"Options": "all", "selectedDatasets": [], "allDatasets": true, "batchSize": 32},
+  "modal_template_state": {
+    "Options": "all",
+    "selectedDatasets": [],
+    "allDatasets": true,
+    "batchSize": 32
+  },
   "task_location": "workspace_tasks",
   "icon": "https://i.imgur.com/P6BjsxA.png",
   "icon_background": "#FFFFFF",
   "headless": true,
   "context_menu": {
-    "target": ["videos_project"]
-  }
+    "target": [
+      "videos_project"
+    ]
+  },
+  "poster": "https://i.imgur.com/FbUmpLU.png"
 }
