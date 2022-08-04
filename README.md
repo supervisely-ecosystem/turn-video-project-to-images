@@ -1,5 +1,5 @@
 <div align="center" markdown>
-<img src="https://i.imgur.com/FbUmpLU.png"/>
+<img src="https://user-images.githubusercontent.com/106374579/182870013-5def504f-ba85-41b2-af88-bc9e3c9ca4e6.png"/>
 
 # Videos project to images project
 
