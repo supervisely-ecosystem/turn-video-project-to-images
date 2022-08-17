@@ -52,7 +52,7 @@ def read_frame_as_jpeg(in_filename, timestamp):
     out, err = (
         ffmpeg.input(in_filename, ss=timestamp)
         .output("pipe:", vframes=1, format="image2", vcodec="mjpeg")
-        .run(capture_stdout=True)
+        .run(capture_stdout=True, quiet=True)
     )
     return out
 
