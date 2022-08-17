@@ -1,19 +1,12 @@
-import os
 import random
-from io import BytesIO
-
-import cv2
-import globals as g
-import supervisely as sly
-from supervisely.io.fs import remove_dir
-
-from queue import Queue
-from threading import Thread
-
 from functools import partial
+from io import BytesIO
 from time import time
 
 import ffmpeg
+import supervisely as sly
+
+import globals as g
 
 
 def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, current_batch):
@@ -21,19 +14,25 @@ def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, current_
         local_time = time()
 
         # progress_cb = get_progress_cb(f"Processing batch {current_batch}:", len(images), is_size=False)
-        new_image_infos = api.image.upload_nps(dataset_id, names, images, metas=metas, progress_cb=None)
+        new_image_infos = api.image.upload_nps(
+            dataset_id, names, images, metas=metas, progress_cb=None
+        )
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
-        g.logger.info(f'batch uploaded in {time() - local_time} seconds')
+        g.logger.info(f"batch uploaded in {time() - local_time} seconds")
 
 
 def convert_tags(tags, prop_container, frame_container, frame_indices=None):
     for video_tag in tags:
-        tag = sly.Tag(video_tag.meta, value=video_tag.value, labeler_login=video_tag.labeler_login)
+        tag = sly.Tag(
+            video_tag.meta, value=video_tag.value, labeler_login=video_tag.labeler_login
+        )
         if video_tag.frame_range is None:
             prop_container.append(tag)
         else:
-            for frame_index in range(video_tag.frame_range[0], video_tag.frame_range[1] + 1):
+            for frame_index in range(
+                video_tag.frame_range[0], video_tag.frame_range[1] + 1
+            ):
                 frame_container[frame_index].append(tag)
                 if frame_indices is not None:
                     frame_indices.append(frame_index)
@@ -51,10 +50,9 @@ def need_download_video(total_frames, total_annotated_frames):
 
 def read_frame_as_jpeg(in_filename, timestamp):
     out, err = (
-        ffmpeg
-            .input(in_filename, ss=timestamp)
-            .output('pipe:', vframes=1, format='image2', vcodec='mjpeg')
-            .run(capture_stdout=True)
+        ffmpeg.input(in_filename, ss=timestamp)
+        .output("pipe:", vframes=1, format="image2", vcodec="mjpeg")
+        .run(capture_stdout=True)
     )
     return out
 
@@ -85,7 +83,9 @@ def get_frames_from_api(api, video_id, video_name, frames_to_convert):
 
 def get_progress_cb(message, total, is_size=False):
     progress = sly.Progress(message, total, is_size=is_size)
-    progress_cb = partial(update_progress, api=g.api, task_id=g.my_app.task_id, progress=progress)
+    progress_cb = partial(
+        update_progress, api=g.api, task_id=g.my_app.task_id, progress=progress
+    )
     progress_cb(0)
     return progress_cb
 
@@ -95,7 +95,9 @@ def update_progress(count, api: sly.Api, task_id, progress: sly.Progress):
     _update_progress_ui(api, task_id, progress)
 
 
-def _update_progress_ui(api: sly.Api, task_id, progress: sly.Progress, stdout_print=False):
+def _update_progress_ui(
+    api: sly.Api, task_id, progress: sly.Progress, stdout_print=False
+):
     if progress.need_report():
         fields = [
             {"field": "data.progressName", "payload": progress.message},
@@ -112,21 +114,23 @@ def _update_progress_ui(api: sly.Api, task_id, progress: sly.Progress, stdout_pr
 def distort_frames(images):
     random.seed(time())
     for index, image in enumerate(images):
-
         for _ in range(50):
-            image[random.randint(0, image.shape[0] - 1),
-                  random.randint(0, image.shape[1] - 1),
-                  random.randint(0, image.shape[2] - 1)] = random.randint(0, 255)
+            image[
+                random.randint(0, image.shape[0] - 1),
+                random.randint(0, image.shape[1] - 1),
+                random.randint(0, image.shape[2] - 1),
+            ] = random.randint(0, 255)
 
 
 def calculate_batch_size(images_batch):
     from PIL import Image
+
     batch_size = 0
 
     for image in images_batch:
         img = Image.fromarray(image)
         img_file = BytesIO()
-        img.save(img_file, 'jpeg')
+        img.save(img_file, "jpeg")
         img_file_size_jpeg = img_file.tell()
         batch_size += img_file_size_jpeg
 
