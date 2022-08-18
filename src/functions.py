@@ -31,7 +31,7 @@ def convert_tags(tags, prop_container, frame_container, frame_indices=None):
             prop_container.append(tag)
         else:
             for frame_index in range(
-                video_tag.frame_range[0], video_tag.frame_range[1] + 1
+                    video_tag.frame_range[0], video_tag.frame_range[1] + 1
             ):
                 frame_container[frame_index].append(tag)
                 if frame_indices is not None:
@@ -51,19 +51,20 @@ def need_download_video(total_frames, total_annotated_frames):
 def read_frame_as_jpeg(in_filename, timestamp):
     out, err = (
         ffmpeg.input(in_filename, ss=timestamp)
-        .output("pipe:", vframes=1, format="image2", vcodec="mjpeg")
-        .run(capture_stdout=True, quiet=True)
+            .output("pipe:", vframes=1, format="image2", vcodec="mjpeg")
+            .run(capture_stdout=True, quiet=True)
     )
     return out
 
 
-def get_frames_from_video(video_name, video_path, frames_to_convert, frames_timestamps):
+def get_frames_from_video(video_info, video_path, frames_to_convert, frames_timestamps):
     image_names = []
     images = []
     for frame_number, timestamp in zip(frames_to_convert, frames_timestamps):
-        img_bytes = read_frame_as_jpeg(in_filename=video_path, timestamp=timestamp)
+        img_bytes = read_frame_as_jpeg(in_filename=video_path,
+                                       timestamp=timestamp - video_info.file_meta.get("startTime", 0))
         img = sly.image.read_bytes(img_bytes)
-        image_name = f"{video_name}_{str(frame_number).zfill(5)}.jpg"
+        image_name = f"{video_info.name}_{str(frame_number).zfill(5)}.jpg"
         image_names.append(image_name)
         images.append(img)
     return image_names, images
@@ -96,7 +97,7 @@ def update_progress(count, api: sly.Api, task_id, progress: sly.Progress):
 
 
 def _update_progress_ui(
-    api: sly.Api, task_id, progress: sly.Progress, stdout_print=False
+        api: sly.Api, task_id, progress: sly.Progress, stdout_print=False
 ):
     if progress.need_report():
         fields = [

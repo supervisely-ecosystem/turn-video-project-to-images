@@ -89,7 +89,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     ]
 
                 else:
-                    frames_to_convert = list(range(0, video_info.frames_count))
+                    frames_to_convert = list(range(video_info.frames_count))
                     frames_timestamps = video_timestamps
 
                 progress = sly.Progress(
@@ -107,7 +107,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     if need_download_video or g.OPTIONS == "all":
                         local_time = time()
                         images_names, images = f.get_frames_from_video(
-                            video_info.name, video_path, batch_frames, batch_timestamps
+                            video_info, video_path, batch_frames, batch_timestamps
                         )
 
                         g.logger.debug(
