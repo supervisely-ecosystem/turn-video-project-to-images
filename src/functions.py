@@ -67,8 +67,6 @@ def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, current_
         g.logger.info(f'batch uploaded in {time() - local_time} seconds')
 
 
-
-
 def convert_tags(tags, prop_container, frame_container, frame_indices=None):
     for video_tag in tags:
         tag = sly.Tag(video_tag.meta, value=video_tag.value, labeler_login=video_tag.labeler_login)
@@ -117,13 +115,12 @@ def get_frames_from_api(api, video_id, video_name, frames_to_convert):
     image_names = []
     images = []
     #     progress = sly.Progress(f"Extracting frames from {video_name}", len(frames_to_convert))
-    for frame_index in frames_to_convert:
-        image_name = video_name + "_" + str(frame_index).zfill(5) + ".jpg"
-        image_names.append(image_name)
+    for frame_idx_batch in sly.batched(frames_to_convert):
+        frames_names = [video_name + "_" + str(frame_index).zfill(5) + ".jpg" for frame_index in frame_idx_batch]
+        frames = api.video.frame.download_nps(video_id=video_id, frame_indexes=frame_idx_batch)
 
-        image = api.video.frame.download_np(video_id, frame_index)
-        images.append(image)
-    #         progress.iter_done_report()
+        image_names.extend(frames_names)
+        images.extend(frames)
     return image_names, images
 
 
