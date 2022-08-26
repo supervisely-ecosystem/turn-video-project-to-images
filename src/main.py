@@ -1,5 +1,3 @@
-import io
-import os
 from collections import defaultdict
 import supervisely as sly
 from supervisely.video_annotation.key_id_map import KeyIdMap
@@ -8,7 +6,6 @@ import globals as g
 import functions as f
 
 from time import time
-import sys
 
 
 @g.my_app.callback("turn_into_images_project")
@@ -32,17 +29,6 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 if g.OPTIONS == "annotated" and len(ann.tags) == 0 and len(ann.frames) == 0:
                     g.my_app.logger.warn(f"Video {video_info.name} annotation is empty in Dataset {dataset_name}")
                     continue
-
-                need_download_video = f.need_download_video(video_info.frames_count, len(ann.frames))
-                video_path = None
-                if need_download_video or g.OPTIONS == "all":
-                    local_time = time()
-                    video_path = os.path.join(g.video_dir, video_info.name)
-
-                    progress_cb = f.get_progress_cb("Downloading video", int(video_info.file_meta['size']),
-                                                    is_size=True)
-                    api.video.download_path(video_info.id, video_path, progress_cb=progress_cb)
-                    g.logger.info(f'video {video_info.name} downloaded in {time() - local_time} seconds')
 
                 frames_to_convert = []
                 video_props = []
@@ -68,25 +54,21 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 for batch_index, batch_frames in enumerate(sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE)):
                     metas = []
                     anns = []
-                    if need_download_video or g.OPTIONS == "all":
-                        local_time = time()
-                        images_names, images = f.get_frames_from_video(video_info.name, video_path, batch_frames)
+                    # if g.OPTIONS == "all":
+                    local_time = time()
+                    images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
+                    g.logger.debug(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
 
-                        g.logger.debug(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
+                    """
+                    too slow calculations, for extreme debug
+                    images_size = f.calculate_batch_size(images) / (1024 * 1024)  # in MegaBytes
+                    g.logger.debug(f'batch size: {images_size} MB')
+                    g.logger.debug(f'mean item size: {images_size / len(images)} MB')
+                    total_images_size += images_size
+                    """
 
-                        """
-                        too slow calculations, for extreme debug
-
-
-                        images_size = f.calculate_batch_size(images) / (1024 * 1024)  # in MegaBytes
-
-                        g.logger.debug(f'batch size: {images_size} MB')
-                        g.logger.debug(f'mean item size: {images_size / len(images)} MB')
-                        total_images_size += images_size
-                        """
-
-                    else:
-                        images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
+                    # else:
+                    #     images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
                         metas.append({
                             "video_id": video_info.id,
