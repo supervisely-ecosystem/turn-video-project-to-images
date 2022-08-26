@@ -54,7 +54,6 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 for batch_index, batch_frames in enumerate(sly.batched(frames_to_convert, batch_size=g.BATCH_SIZE)):
                     metas = []
                     anns = []
-                    # if g.OPTIONS == "all":
                     local_time = time()
                     images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     g.logger.debug(f'extracted {len(batch_frames)} by {time() - local_time} seconds')
@@ -67,8 +66,6 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     total_images_size += images_size
                     """
 
-                    # else:
-                    #     images_names, images = f.get_frames_from_api(api, video_info.id, video_info.name, batch_frames)
                     for frame_index in batch_frames:
                         metas.append({
                             "video_id": video_info.id,
