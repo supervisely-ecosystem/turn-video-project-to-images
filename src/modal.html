@@ -1,6 +1,8 @@
 <div>
-
     <sly-field title="Choose whether to transform all video frames or only annotated frames">
+        <sly-icon slot="icon" :options="{ color: '#ff7c49', bgColor: '#fff39b', rounded: false }">
+            <i class="zmdi zmdi-view-list-alt"></i>
+        </sly-icon>
         <el-select v-model="state.Options">
             <el-option key="all" label="All video frames" value="all"></el-option>
             <el-option key="annotated" label="Only annotated video frames" value="annotated"></el-option>
@@ -8,24 +10,44 @@
     </sly-field>
 
     <sly-field title="Batch size">
-<!--        <el-slider-->
-<!--                class="ml5 mr5"-->
-<!--                v-model="state.batchSize"-->
-<!--                :step="100"-->
-<!--                :min="100"-->
-<!--                :max="1000"-->
-<!--                show-stops>-->
-<!--        </el-slider>-->
+        <sly-icon slot="icon" :options="{ color: '#4977ff', bgColor: '#ddf2ff', rounded: false }">
+            <i class="zmdi zmdi-view-comfy"></i>
+        </sly-icon>
         <el-input-number v-model="state.batchSize" :min="32" :max="2048"></el-input-number>
     </sly-field>
-    <div class="fflex align-start">
-        <el-checkbox v-model="state.allDatasets" class="mt10 mr10"></el-checkbox>
-        <sly-field class="mt20" title="All datasets"
-                   description="Transform all datasets from project">
-        </sly-field>
-    </div>
-    <div v-if="!state.allDatasets">
-        <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
-                            :options="{multiple: true}"></sly-select-dataset>
-    </div>
+
+
+    <sly-field>
+        <sly-icon slot="icon" :options="{ color: '#2cd26e', bgColor: '#d8f8e7', rounded: false }">
+            <i class="zmdi zmdi-collection-folder-image"></i>
+        </sly-icon>
+        <div class="fflex align-start">
+            <sly-field class="mt20" title="Datasets"
+                       description="">
+                <el-checkbox v-model="state.allDatasets" class="mt10 mr10">Transform all datasets from project
+                </el-checkbox>
+
+            </sly-field>
+        </div>
+        <div v-if="!state.allDatasets">
+            <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
+                                :options="{multiple: true}"></sly-select-dataset>
+        </div>
+    </sly-field>
+
+    <sly-field>
+        <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
+            <i class="zmdi zmdi-fast-forward"></i>
+        </sly-icon>
+        <div class="fflex align-start">
+            <sly-field title="Sample result frames" description="">
+                <el-checkbox v-model="state.sampleResultFrames" class="mt10 mr10">
+                    Extract every N-th frame
+                </el-checkbox>
+            </sly-field>
+        </div>
+        <div v-if="state.sampleResultFrames">
+            <el-input-number v-model="state.framesStep" :min="1"></el-input-number>
+        </div>
+    </sly-field>
 </div>

@@ -2,7 +2,7 @@ import os
 import json
 import supervisely as sly
 from supervisely.io.fs import mkdir
-
+from distutils.util import strtobool
 
 logger = sly.logger
 
@@ -13,12 +13,16 @@ TEAM_ID = int(os.environ['context.teamId'])
 WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
 
+SAMPLE_RESULT_FRAMES = bool(strtobool(os.getenv("modal.state.sampleResultFrames")))
+if SAMPLE_RESULT_FRAMES:
+    FRAMES_STEP = int(os.environ["modal.state.framesStep"])
+
 LOG_LEVEL = str(os.environ["LOG_LEVEL"])
 
 OPTIONS = os.environ['modal.state.Options']
 BATCH_SIZE = int(os.environ['modal.state.batchSize'])
 
-SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
+# SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
 ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ('true', '1', 't')
 if ALL_DATASETS:
     SELECTED_DATASETS = [dataset.name for dataset in api.dataset.get_list(PROJECT_ID)]
