@@ -17,7 +17,7 @@
     "selectedDatasets": [],
     "allDatasets": true,
     "batchSize": 32,
-    "sampleResultFrames": true,
+    "sampleResultFrames": false,
     "framesStep": 10
   },
   "task_location": "workspace_tasks",

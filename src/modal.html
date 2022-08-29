@@ -16,38 +16,37 @@
         <el-input-number v-model="state.batchSize" :min="32" :max="2048"></el-input-number>
     </sly-field>
 
-
-    <sly-field>
+    <sly-field title="Datasets">
         <sly-icon slot="icon" :options="{ color: '#2cd26e', bgColor: '#d8f8e7', rounded: false }">
             <i class="zmdi zmdi-collection-folder-image"></i>
         </sly-icon>
-        <div class="fflex align-start">
-            <sly-field class="mt20" title="Datasets"
-                       description="">
-                <el-checkbox v-model="state.allDatasets" class="mt10 mr10">Transform all datasets from project
-                </el-checkbox>
+        <el-checkbox v-model="state.allDatasets">Transform all datasets from project
+        </el-checkbox>
 
-            </sly-field>
-        </div>
         <div v-if="!state.allDatasets">
             <sly-select-dataset :project-id="context.projectId" :datasets.sync="state.selectedDatasets"
                                 :options="{multiple: true}"></sly-select-dataset>
         </div>
     </sly-field>
 
-    <sly-field>
-        <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
-            <i class="zmdi zmdi-fast-forward"></i>
-        </sly-icon>
-        <div class="fflex align-start">
-            <sly-field title="Sample result frames" description="">
-                <el-checkbox v-model="state.sampleResultFrames" class="mt10 mr10">
-                    Extract every N-th frame
-                </el-checkbox>
-            </sly-field>
-        </div>
-        <div v-if="state.sampleResultFrames">
-            <el-input-number v-model="state.framesStep" :min="1"></el-input-number>
-        </div>
-    </sly-field>
+    <el-checkbox v-model="state.sampleResultFrames">
+        <b style="font-weight: 500; padding: 0; font-size: 14px;">Sample result frames</b>
+    </el-checkbox>
+
+    <div v-if="state.sampleResultFrames">
+        <sly-field title="Frame step" description="Extract every N-th frame" v-if="state.Options === 'all'">
+            <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
+                <i class="zmdi zmdi-fast-forward"></i>
+            </sly-icon>
+        </sly-field>
+
+        <sly-field title="Frame step" description="Extract every annotated N-th frame"
+                   v-if="state.Options === 'annotated'">
+            <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
+                <i class="zmdi zmdi-fast-forward"></i>
+            </sly-icon>
+        </sly-field>
+        <el-input-number v-model="state.framesStep" :min="1"></el-input-number>
+
+    </div>
 </div>
