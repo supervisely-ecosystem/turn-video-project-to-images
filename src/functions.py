@@ -36,7 +36,7 @@ def add_object_id_tag(vobject_id, prop_container):
 
 
 def get_frames_from_api(api, video_id, video_name, frames_to_convert):
-    image_names = [video_name + "_" + str(frame_index).zfill(5) + ".jpg" for frame_index in frames_to_convert]
+    image_names = [f"{video_name}_{str(frame_index).zfill(5)}.jpg" for frame_index in frames_to_convert]
     images = api.video.frame.download_nps(video_id=video_id, frame_indexes=frames_to_convert)
     return image_names, images
 
@@ -70,7 +70,6 @@ def _update_progress_ui(api: sly.Api, task_id, progress: sly.Progress, stdout_pr
 def distort_frames(images):
     random.seed(time())
     for index, image in enumerate(images):
-
         for _ in range(50):
             image[random.randint(0, image.shape[0] - 1),
                   random.randint(0, image.shape[1] - 1),
@@ -87,3 +86,11 @@ def calculate_batch_size(images_batch):
         img_file_size_jpeg = img_file.tell()
         batch_size += img_file_size_jpeg
     return batch_size
+
+
+def calc_frame_step(frames_to_convert, frame_step):
+    res = [frames_to_convert[0]]
+    for i in frames_to_convert[1:]:
+        if i - res[-1] >= frame_step:
+            res.append(i)
+    return res

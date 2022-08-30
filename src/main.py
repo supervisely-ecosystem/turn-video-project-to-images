@@ -48,6 +48,12 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                 else:
                     frames_to_convert = list(range(0, video_info.frames_count))
 
+                if g.SAMPLE_RESULT_FRAMES:
+                    if g.OPTIONS == "all":
+                        frames_to_convert = frames_to_convert[::g.FRAMES_STEP]
+                    else:
+                        frames_to_convert = f.calc_frame_step(frames_to_convert=frames_to_convert, frame_step=g.FRAMES_STEP)
+
                 progress = sly.Progress("Processing video frames: {!r}".format(video_info.name), len(frames_to_convert))
 
                 # total_images_size = 0

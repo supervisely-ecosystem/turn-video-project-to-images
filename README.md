@@ -42,10 +42,10 @@ Application key points:
 
 <img src="https://i.imgur.com/rckw2ZP.png" width="100%"/>
 
-3. Check the box if you need only annotated video frames, select datasets and press the `Run` button.
+3. Select whether you need all or only annotated video frames, select batch size, datasets and set frame step if needed. Press the `Run` button to launch.
  
 <div align="center" markdown>
-<img src="https://i.imgur.com/vej5rqM.png" width="500"/>
+<img src="https://user-images.githubusercontent.com/48913536/187448689-15f050a4-6237-4d58-8c93-d0f34ff4ea13.png" width="500"/>
 </div>
 
 

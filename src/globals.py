@@ -2,7 +2,7 @@ import os
 import json
 import supervisely as sly
 from supervisely.io.fs import mkdir
-
+from distutils.util import strtobool
 
 logger = sly.logger
 
@@ -12,6 +12,10 @@ api: sly.Api = my_app.public_api
 TEAM_ID = int(os.environ['context.teamId'])
 WORKSPACE_ID = int(os.environ['context.workspaceId'])
 PROJECT_ID = int(os.environ["modal.state.slyProjectId"])
+
+SAMPLE_RESULT_FRAMES = bool(strtobool(os.getenv("modal.state.sampleResultFrames")))
+if SAMPLE_RESULT_FRAMES:
+    FRAMES_STEP = int(os.environ["modal.state.framesStep"])
 
 LOG_LEVEL = str(os.environ["LOG_LEVEL"])
 
