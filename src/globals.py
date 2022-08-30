@@ -22,7 +22,7 @@ LOG_LEVEL = str(os.environ["LOG_LEVEL"])
 OPTIONS = os.environ['modal.state.Options']
 BATCH_SIZE = int(os.environ['modal.state.batchSize'])
 
-SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
+# SELECTED_DATASETS = json.loads(os.environ["modal.state.selectedDatasets"].replace("'", '"'))
 ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ('true', '1', 't')
 if ALL_DATASETS:
     SELECTED_DATASETS = [dataset.name for dataset in api.dataset.get_list(PROJECT_ID)]

@@ -30,23 +30,15 @@
     </sly-field>
 
     <el-checkbox v-model="state.sampleResultFrames">
-        <b style="font-weight: 500; padding: 0; font-size: 14px;">Sample result frames</b>
+        <b style="font-weight: 500; padding: 0; font-size: 14px;">Downsample result frames</b>
     </el-checkbox>
 
     <div v-if="state.sampleResultFrames">
-        <sly-field title="Frame step" description="Extract every N-th frame" v-if="state.Options === 'all'">
+        <sly-field title="Frame step" :description="`Extract every N-th frame from ${state.Options} frames`">
             <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
                 <i class="zmdi zmdi-fast-forward"></i>
             </sly-icon>
+            <el-input-number v-model="state.framesStep" :min="1"></el-input-number>
         </sly-field>
-
-        <sly-field title="Frame step" description="Extract every annotated N-th frame"
-                   v-if="state.Options === 'annotated'">
-            <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
-                <i class="zmdi zmdi-fast-forward"></i>
-            </sly-icon>
-        </sly-field>
-        <el-input-number v-model="state.framesStep" :min="1"></el-input-number>
-
     </div>
 </div>
