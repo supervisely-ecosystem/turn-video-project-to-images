@@ -45,7 +45,7 @@ Application key points:
 3. Select whether you need all or only annotated video frames, select batch size, datasets and set frame step if needed. Press the `Run` button to launch.
  
 <div align="center" markdown>
-<img src="https://user-images.githubusercontent.com/48913536/187425913-b9cfc4bd-b49d-423f-baa2-baebb882aa73.png" width="500"/>
+<img src="https://user-images.githubusercontent.com/48913536/187448689-15f050a4-6237-4d58-8c93-d0f34ff4ea13.png" width="500"/>
 </div>
 
 
