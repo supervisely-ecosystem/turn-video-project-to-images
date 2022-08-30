@@ -34,7 +34,7 @@
     </el-checkbox>
 
     <div v-if="state.sampleResultFrames">
-        <sly-field title="Frame step" :description="`Extract every N-th frame from ${state.Options} frames`">
+        <sly-field title="Frame step" :description="`Extract every N-th frame from ${state.Options} frames (minimum distance between frames)`">
             <sly-icon slot="icon" :options="{ color: 'red', bgColor: '#FFCCCB', rounded: false }">
                 <i class="zmdi zmdi-fast-forward"></i>
             </sly-icon>

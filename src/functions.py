@@ -89,15 +89,8 @@ def calculate_batch_size(images_batch):
 
 
 def calc_frame_step(frames_to_convert, frame_step):
-    result_frames = [frames_to_convert[0]]
-    cnt_idx = -1
-    for idx in range(len(frames_to_convert)):
-        cnt_idx += 1
-        prev_frame, curr_frame = frames_to_convert[idx - 1], frames_to_convert[idx]
-        if cnt_idx % frame_step == 0 and cnt_idx != 0:
-            result_frames.append(curr_frame)
-            cnt_idx = 0
-        elif curr_frame - prev_frame >= frame_step:
-            result_frames.append(curr_frame)
-            cnt_idx = 0
-    return result_frames
+    res = [frames_to_convert[0]]
+    for i in frames_to_convert[1:]:
+        if i - res[-1] >= frame_step:
+            res.append(i)
+    return res
