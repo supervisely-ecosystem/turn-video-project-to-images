@@ -8,7 +8,7 @@
     "data operations"
   ],
   "description": "Creates images project from video project",
-  "docker_image": "supervisely/base-py-sdk:6.60.1",
+  "docker_image": "supervisely/base-py-sdk:6.63.9",
   "min_instance_version": "6.5.28",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
