@@ -43,7 +43,7 @@ def add_object_id_tag(vobject_id, prop_container):
 
 
 def get_frames_from_api(api, video_id, video_name, frames_to_convert, dataset_name):
-    if g.project.custom_data["original_images"]:
+    if g.project.custom_data.get("original_images") is not None:
         image_names = []
         for frame in frames_to_convert:
             image_name = g.project.custom_data["original_images"][dataset_name][
