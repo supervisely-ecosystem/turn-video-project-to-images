@@ -21,7 +21,7 @@
     "framesStep": 10
   },
   "task_location": "workspace_tasks",
-  "icon": "https://i.imgur.com/P6BjsxA.png",
+  "icon": "media/icon.png",
   "icon_background": "#FFFFFF",
   "headless": true,
   "context_menu": {
