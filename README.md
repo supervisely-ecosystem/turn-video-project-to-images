@@ -36,11 +36,11 @@ Application key points:
 
 1. Add [Videos project to images project](https://ecosystem.supervise.ly/apps/turn-video-project-into-images) to your team from Ecosystem.
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/turn-video-project-into-images" src="https://i.imgur.com/9gUzdYM.png" width="350px" style='padding-bottom: 20px'/>  
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/turn-video-project-into-images" src="media/htu1.png" width="350px" style='padding-bottom: 20px'/>  
 
 2. Run app from the context menu of **Videos Project**:
 
-<img src="https://i.imgur.com/rckw2ZP.png" width="100%"/>
+<img src="media/htu2.png" width="100%"/>
 
 3. Select whether you need all or only annotated video frames, select batch size, datasets and set frame step if needed. Press the `Run` button to launch.
  
@@ -55,4 +55,4 @@ After running the application, you will be redirected to the `Tasks` page.
 Once application processing has finished, your project will be available.  
 Click on the `project name` to proceed to it.
 
-<img src="https://i.imgur.com/ADEnjJd.png"/>
+<img src="media/r1.png"/>
