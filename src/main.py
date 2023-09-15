@@ -138,7 +138,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         )
 
                         frame_np = images[idx]
-                        height, width, _ = frame_np.shape[:2]
+                        height, width, _ = frame_np.shape
                         img_size = (height, width)
 
                         # ! Debug logging, delete.
