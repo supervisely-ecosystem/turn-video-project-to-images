@@ -100,7 +100,7 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     total_images_size += images_size
                     """
 
-                    for frame_index in batch_frames:
+                    for idx, frame_index in enumerate(batch_frames):
                         metas.append(
                             {
                                 "video_id": video_info.id,
@@ -136,9 +136,18 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                             video_props.copy()
                             + video_frame_tags.get(frame_index, []).copy()
                         )
+
+                        frame_np = images[idx]
+                        height, width, _ = frame_np.shape
+                        img_size = (height, width)
+
+                        # ! Debug logging, delete.
+
+                        sly.logger.debug(f"frame idx {idx} size (h x w): {img_size}")
+
                         anns.append(
                             sly.Annotation(
-                                ann.img_size,
+                                img_size,
                                 labels=labels,
                                 img_tags=sly.TagCollection(img_tags),
                             )
