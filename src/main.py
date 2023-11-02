@@ -168,10 +168,15 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                     )
                     progress.iters_done_report(len(images_names))
 
+                    if g.my_app.app_is_stoped():
+                        g.logger.debug("turn_into_images_project is finished.")
+                        return
+
                 # g.logger.debug(f'total images size for video: {total_images_size} MB')
                 g.logger.info(
                     f"video {video_info.name} converted in {time() - general_time} seconds"
                 )
+
     g.my_app.stop()
 
 
