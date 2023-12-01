@@ -56,7 +56,7 @@ def download_frames_with_retry(api: sly.Api, video_id, frames_to_convert):
             if curr_retry <= retry_cnt:
                 sleep(2 ** curr_retry)
                 sly.logger.warn(f"Failed to download frames, retry {curr_retry} of {retry_cnt}... Error: {e}")
-    raise RuntimeError(f"Failed to download frames with ids {frames_to_convert}. Check your data and try again. Error: {e}")
+    raise RuntimeError(f"Failed to download frames with ids {frames_to_convert}. Check your data and try again later.")
 
 
 def get_frames_from_api(api: sly.Api, video_id, video_name, frames_to_convert, dataset_name):
