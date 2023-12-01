@@ -1,7 +1,7 @@
 import random
 from functools import partial
 from io import BytesIO
-from time import time
+from time import sleep, time
 
 import supervisely as sly
 
@@ -42,7 +42,24 @@ def add_object_id_tag(vobject_id, prop_container):
     prop_container.append(vobj_id_tag)
 
 
-def get_frames_from_api(api, video_id, video_name, frames_to_convert, dataset_name):
+def download_frames_with_retry(api: sly.Api, video_id, frames_to_convert):
+    retry_cnt = 5
+    curr_retry = 0
+    while curr_retry <= retry_cnt:
+        try:
+            images = api.video.frame.download_nps(video_id, frames_to_convert)
+            if len(images) != len(frames_to_convert):
+                raise RuntimeError(f"Downloaded {len(images)} frames, but {len(frames_to_convert)} expected.")
+            return images
+        except Exception as e:
+            curr_retry += 1
+            if curr_retry <= retry_cnt:
+                sleep(2 ** curr_retry)
+                sly.logger.warn(f"Failed to download frames, retry {curr_retry} of {retry_cnt}... Error: {e}")
+    raise RuntimeError(f"Failed to download frames with ids {frames_to_convert}. Check your data and try again. Error: {e}")
+
+
+def get_frames_from_api(api: sly.Api, video_id, video_name, frames_to_convert, dataset_name):
     if g.project.custom_data.get("original_images") is not None:
         image_names = []
         for frame in frames_to_convert:
@@ -55,9 +72,7 @@ def get_frames_from_api(api, video_id, video_name, frames_to_convert, dataset_na
             f"{video_name}_{str(frame_index).zfill(5)}.jpg"
             for frame_index in frames_to_convert
         ]
-    images = api.video.frame.download_nps(
-        video_id=video_id, frame_indexes=frames_to_convert
-    )
+    images = download_frames_with_retry(api, video_id, frames_to_convert)
     return image_names, images
 
 
