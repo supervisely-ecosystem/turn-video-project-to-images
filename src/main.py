@@ -141,10 +141,6 @@ def turn_into_images_project(api: sly.Api, task_id, context, state, app_logger):
                         height, width, _ = frame_np.shape
                         img_size = (height, width)
 
-                        # ! Debug logging, delete.
-
-                        sly.logger.debug(f"frame idx {idx} size (h x w): {img_size}")
-
                         anns.append(
                             sly.Annotation(
                                 img_size,
