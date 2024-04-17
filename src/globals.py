@@ -10,42 +10,54 @@ if sly.is_development():
     load_dotenv("local.env")
     load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-logger = sly.logger
+# region envvars
+team_id = sly.env.team_id()
+workspace_id = sly.env.workspace_id()
+project_id = sly.env.project_id()
+# endregion
+sly.logger.info(
+    f"Api initialized. Team: {team_id}. Workspace: {workspace_id}. Project: {project_id}"
+)
 
-my_app = sly.AppService()
-api: sly.Api = my_app.public_api
+api = sly.Api.from_env()
 
-TEAM_ID = sly.env.team_id()
-WORKSPACE_ID = sly.env.workspace_id()
-PROJECT_ID = sly.env.project_id()
+# region modalvars
+sample_result_frames = bool(strtobool(os.getenv("modal.state.sampleResultFrames")))
+if sample_result_frames:
+    frames_step = int(os.environ["modal.state.framesStep"])
+else:
+    frames_step = None
 
-SAMPLE_RESULT_FRAMES = bool(strtobool(os.getenv("modal.state.sampleResultFrames")))
-if SAMPLE_RESULT_FRAMES:
-    FRAMES_STEP = int(os.environ["modal.state.framesStep"])
+options = os.environ["modal.state.Options"]
+batch_size = int(os.environ["modal.state.batchSize"])
 
-LOG_LEVEL = str(os.environ["LOG_LEVEL"])
-
-OPTIONS = os.environ["modal.state.Options"]
-BATCH_SIZE = int(os.environ["modal.state.batchSize"])
-
-SELECTED_DATASETS = json.loads(
+selected_datasets = json.loads(
     os.environ["modal.state.selectedDatasets"].replace("'", '"')
 )
 
-ALL_DATASETS = os.getenv("modal.state.allDatasets").lower() in ("true", "1", "t")
-if ALL_DATASETS or len(SELECTED_DATASETS) == 0:
-    SELECTED_DATASETS = [dataset.name for dataset in api.dataset.get_list(PROJECT_ID)]
+all_datasets = os.getenv("modal.state.allDatasets").lower() in ("true", "1", "t")
+if all_datasets or len(selected_datasets) == 0:
+    selected_datasets = [dataset.name for dataset in api.dataset.get_list(project_id)]
+# endregion
+sly.logger.info(
+    f"Sample result frames: {sample_result_frames}. Frames step: {frames_step}. "
+    f"Options: {options}. Batch size: {batch_size}. Selected datasets: {selected_datasets}. "
+    f"All datasets: {all_datasets}"
+)
 
 need_download_threshold = 0.15
 
-storage_dir = os.path.join(my_app.data_dir, "sly_base_sir")
+storage_dir = os.path.join(os.getcwd(), "storage")
 mkdir(storage_dir, True)
 video_dir = os.path.join(storage_dir, "video")
 mkdir(video_dir)
 img_dir = os.path.join(storage_dir, "images")
 mkdir(img_dir)
+sly.logger.debug(
+    f"Storage directory: {storage_dir}, video directory: {video_dir}, images directory: {img_dir}"
+)
 
-project = api.project.get_info_by_id(PROJECT_ID)
+project = api.project.get_info_by_id(project_id)
 if project is None:
     raise RuntimeError("Project {!r} not found".format(project.name))
 if project.type != str(sly.ProjectType.VIDEOS):
@@ -66,7 +78,7 @@ if "object_id" not in [tag.name for tag in meta.tag_metas]:
     )
     meta = meta.add_tag_meta(vobj_id_tag_meta)
 
-if OPTIONS == "annotated" and len(meta.obj_classes) == 0 and len(meta.tag_metas) == 0:
+if options == "annotated" and len(meta.obj_classes) == 0 and len(meta.tag_metas) == 0:
     raise ValueError(
         "Nothing to convert, there are no tags and classes in project {!r}".format(
             project.name
