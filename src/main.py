@@ -28,7 +28,6 @@ def turn_into_images_project(api: sly.Api):
             for video_info in batch:
                 general_time = time()
                 ann_info = api.video.annotation.download(video_info.id)
-                return
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
                 if (
                     g.options == "annotated"
