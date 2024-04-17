@@ -14,6 +14,11 @@ if sly.is_development():
 team_id = sly.env.team_id()
 workspace_id = sly.env.workspace_id()
 project_id = sly.env.project_id()
+task_id = sly.env.task_id(raise_not_found=False)
+if sly.is_development():
+    sly.logger.warning("Development mode, will set task_id to 0 to avoid errors")
+    # task_id = 0
+
 # endregion
 sly.logger.info(
     f"Api initialized. Team: {team_id}. Workspace: {workspace_id}. Project: {project_id}"
@@ -58,6 +63,7 @@ sly.logger.debug(
 )
 
 project = api.project.get_info_by_id(project_id)
+sly.logger.info(f"Working with project {project.name}...")
 if project is None:
     raise RuntimeError("Project {!r} not found".format(project.name))
 if project.type != str(sly.ProjectType.VIDEOS):
@@ -69,6 +75,7 @@ if project.type != str(sly.ProjectType.VIDEOS):
 
 meta_json = api.project.get_meta(project.id)
 meta = sly.ProjectMeta.from_json(meta_json)
+sly.logger.info("Project meta received...")
 
 if "object_id" not in [tag.name for tag in meta.tag_metas]:
     vobj_id_tag_meta = sly.TagMeta(

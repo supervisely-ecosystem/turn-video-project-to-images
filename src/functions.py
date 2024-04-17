@@ -18,7 +18,7 @@ def upload_frames(api: sly.Api, dataset_id, names, images, anns, metas, current_
         )
         new_image_ids = [img_info.id for img_info in new_image_infos]
         api.annotation.upload_anns(new_image_ids, anns)
-        g.logger.info(f"batch uploaded in {time() - local_time} seconds")
+        sly.logger.info(f"batch uploaded in {time() - local_time} seconds")
 
 
 def convert_tags(tags, prop_container, frame_container, frame_indices=None):
@@ -49,17 +49,25 @@ def download_frames_with_retry(api: sly.Api, video_id, frames_to_convert):
         try:
             images = api.video.frame.download_nps(video_id, frames_to_convert)
             if len(images) != len(frames_to_convert):
-                raise RuntimeError(f"Downloaded {len(images)} frames, but {len(frames_to_convert)} expected.")
+                raise RuntimeError(
+                    f"Downloaded {len(images)} frames, but {len(frames_to_convert)} expected."
+                )
             return images
         except Exception as e:
             curr_retry += 1
             if curr_retry <= retry_cnt:
-                sleep(2 ** curr_retry)
-                sly.logger.warn(f"Failed to download frames, retry {curr_retry} of {retry_cnt}... Error: {e}")
-    raise RuntimeError(f"Failed to download frames with ids {frames_to_convert}. Check your data and try again later.")
+                sleep(2**curr_retry)
+                sly.logger.warn(
+                    f"Failed to download frames, retry {curr_retry} of {retry_cnt}... Error: {e}"
+                )
+    raise RuntimeError(
+        f"Failed to download frames with ids {frames_to_convert}. Check your data and try again later."
+    )
 
 
-def get_frames_from_api(api: sly.Api, video_id, video_name, frames_to_convert, dataset_name):
+def get_frames_from_api(
+    api: sly.Api, video_id, video_name, frames_to_convert, dataset_name
+):
     if g.project.custom_data.get("original_images") is not None:
         image_names = []
         for frame in frames_to_convert:
@@ -79,7 +87,7 @@ def get_frames_from_api(api: sly.Api, video_id, video_name, frames_to_convert, d
 def get_progress_cb(message, total, is_size=False):
     progress = sly.Progress(message, total, is_size=is_size)
     progress_cb = partial(
-        update_progress, api=g.api, task_id=g.my_app.task_id, progress=progress
+        update_progress, api=g.api, task_id=g.task_id, progress=progress
     )
     progress_cb(0)
     return progress_cb
