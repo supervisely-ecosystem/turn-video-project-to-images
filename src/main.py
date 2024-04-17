@@ -5,6 +5,7 @@ import supervisely as sly
 from supervisely.video_annotation.key_id_map import KeyIdMap
 
 import functions as f
+
 import globals as g
 
 
@@ -27,13 +28,14 @@ def turn_into_images_project(api: sly.Api):
             for video_info in batch:
                 general_time = time()
                 ann_info = api.video.annotation.download(video_info.id)
+                return
                 ann = sly.VideoAnnotation.from_json(ann_info, g.meta, key_id_map)
                 if (
                     g.options == "annotated"
                     and len(ann.tags) == 0
                     and len(ann.frames) == 0
                 ):
-                    g.my_app.logger.warn(
+                    sly.logger.warn(
                         f"Video {video_info.name} annotation is empty in Dataset {dataset_name}"
                     )
                     continue
@@ -68,7 +70,7 @@ def turn_into_images_project(api: sly.Api):
                     else:
                         frames_to_convert = f.calc_frame_step(
                             frames_to_convert=frames_to_convert,
-                            frame_step=g.FRAMES_STEP,
+                            frame_step=g.frames_step,
                         )
 
                 progress = sly.Progress(
