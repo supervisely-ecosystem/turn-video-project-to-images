@@ -1,7 +1,7 @@
 import json
 import os
 from distutils.util import strtobool
-
+from typing import Tuple
 import supervisely as sly
 from dotenv import load_dotenv
 from supervisely.io.fs import mkdir
@@ -10,6 +10,9 @@ if sly.is_development():
     load_dotenv("local.env")
     load_dotenv(os.path.expanduser("~/supervisely.env"))
 
+# region constants
+AUTOTRACKED_TAG_NAME = "auto-tracked"
+# endregion
 # region envvars
 team_id = sly.env.team_id()
 workspace_id = sly.env.workspace_id()
@@ -91,3 +94,21 @@ if options == "annotated" and len(meta.obj_classes) == 0 and len(meta.tag_metas)
             project.name
         )
     )
+
+
+def add_auto_tag_meta(meta: sly.ProjectMeta) -> Tuple[sly.ProjectMeta, sly.TagMeta]:
+    def get_free_tag_name(meta: sly.ProjectMeta, tag_name: str) -> str:
+        new_tag_name = tag_name
+        i = 1
+        while meta.get_tag_meta(new_tag_name) is not None:
+            new_tag_name = f"{tag_name}_{i}"
+            i += 1
+        return new_tag_name
+
+    new_tag_name = get_free_tag_name(meta, AUTOTRACKED_TAG_NAME)
+    new_tag_meta = sly.TagMeta(new_tag_name, sly.TagValueType.NONE)
+    return meta.add_tag_meta(new_tag_meta), new_tag_meta
+
+
+meta, autotracked_tag_meta = add_auto_tag_meta(meta)
+sly.logger.info("Tag meta for auto-tracked added...")

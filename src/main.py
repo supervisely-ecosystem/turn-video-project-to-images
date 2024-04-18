@@ -18,6 +18,7 @@ def turn_into_images_project(api: sly.Api):
         change_name_if_conflict=True,
     )
     api.project.update_meta(dst_project.id, g.meta.to_json())
+    sly.logger.info(f"Project meta for {dst_project.name} has been updated.")
 
     key_id_map = KeyIdMap()
     for dataset_name in g.selected_datasets:
@@ -120,6 +121,10 @@ def turn_into_images_project(api: sly.Api):
                                     figure.parent_object.obj_class,
                                     sly.TagCollection(tags_to_assign),
                                 )
+                                if figure.track_id is not None:
+                                    autotrack_tag = sly.Tag(g.autotracked_tag_meta)
+                                    cur_label = cur_label.add_tag(autotrack_tag)
+
                                 labels.append(cur_label)
 
                         img_tags = (
