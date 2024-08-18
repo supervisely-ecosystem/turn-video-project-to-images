@@ -7,10 +7,12 @@ from supervisely.video_annotation.key_id_map import KeyIdMap
 import functions as f
 
 import globals as g
+import workflow as w
 
 
 def turn_into_images_project(api: sly.Api):
     res_project_name = f"{g.project.name}(images)"
+    w.workflow_input(api, g.project.id)
     dst_project = api.project.create(
         g.workspace_id,
         res_project_name,
@@ -158,7 +160,7 @@ def turn_into_images_project(api: sly.Api):
                 sly.logger.info(
                     f"video {video_info.name} converted in {time() - general_time} seconds"
                 )
-
+    w.workflow_output(api, dst_project.id)
 
 if __name__ == "__main__":
     turn_into_images_project(g.api)
